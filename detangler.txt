@@ -1,0 +1,15 @@
+{
+  reportDir target/detangled/
+  searchPaths [
+    console/target/todo-application.jar
+  ]
+  level 2
+  startsWith {
+    include [[com seanshubin todo application]]
+    drop [[com seanshubin todo application]]
+    exclude []
+  }
+  allowedInCycle [
+  ]
+  canFailBuild true
+}
