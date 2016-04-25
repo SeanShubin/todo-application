@@ -1,0 +1,37 @@
+/* Color scheme (monochrome)
+061539 (darker)
+162955
+2E4172
+4F628E
+7887AB (lighter)
+*/
+
+body {
+    background-color: #061539;
+    color: #7887AB;
+}
+
+input {
+    background-color: #162955;
+    color: #7887AB;
+    border: 2px solid #2E4172;
+}
+
+label {
+    color: #7887AB;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+button {
+    background-color: #162955;
+    color: #7887AB;
+    border: 2px solid #2E4172;
+}
+
+::-webkit-input-placeholder {
+    color: #4F628E;
+}
