@@ -20,11 +20,7 @@ If it turns out to be the case that some things are easier to test at the detail
 class ClassPathHandlerTest extends FunSuite {
   val charset = StandardCharsets.UTF_8
   val contentTypeByExtension = Map(
-    ".js" -> ContentType("text/javascript", Some(charset)),
-    ".css" -> ContentType("text/css", Some(charset)),
-    ".txt" -> ContentType("text/plain", Some(charset)),
-    ".html" -> ContentType("text/html", Some(charset)),
-    ".ico" -> ContentType("image/x-icon", None)
+    ".txt" -> ContentType("text/plain", Some(charset))
   )
 
   test("load from class path") {

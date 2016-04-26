@@ -10,7 +10,7 @@ But this seems impossible!
 We can't wire everything up without the configuration, and to validate the configuration we must invoke something
 This will happen anytime something needs to be wired within a certain lifecycle
 In this case, we have the lifecycle of the entire application, from command line invocation to exit
-We also have an inner lifecycle that expects to have a valid configuration
+We also have an inner lifecycle that starts as soon as we have a valid configuration
 So we split the wiring up into two classes, one for each lifecycle
 The EntryPointWiring creates a runner that knows how to validate the configuration
 This frees up the ConfigurationWiring to assume a valid configuration already exists
