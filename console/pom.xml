@@ -34,7 +34,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.seanshubin.todo.application.console.ConsoleApplication</mainClass>
+                            <mainClass>com.seanshubin.todo.application.console.EntryPoint</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -30,6 +30,16 @@
                 <version>2.2.6</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.3.7.v20160115</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client</artifactId>
+                <version>1.21.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <modules>
