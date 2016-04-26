@@ -9,6 +9,11 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
+            <groupId>com.seanshubin.todo.application</groupId>
+            <artifactId>todo-application-contract</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>

@@ -12,8 +12,8 @@
 - With this in mind, I will counter any objection in the form of "but that takes so much effort write!", with something of the form "effort that makes code easier to maintain is worth it"
 
 ## Design Principles
-- Test Driven Design
 - Top Down Design
+- Test Driven Design
 - Design by Contract
 - No mocks
     - while I don't have a problem with mocks in principle, you should only reach for them when dummys, stubs, or fakes will not work
