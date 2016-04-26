@@ -6,7 +6,7 @@ import com.seanshubin.todo.application.contract.FilesContract
 
 class FileSystemHandler(directory: Path,
                         files: FilesContract,
-                        contentTypeByExtension: Map[String, String]) extends ValueHandler {
+                        contentTypeByExtension: Map[String, ContentType]) extends ValueHandler {
   override def handle(request: RequestValue): Option[ResponseValue] = {
     val file = directory.resolve(request.path)
     if (files.exists(file)) {
