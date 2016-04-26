@@ -1,10 +1,6 @@
 package com.seanshubin.todo.application.core
 
-import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
-
 import com.seanshubin.todo.application.contract.ClassLoaderContract
-
-import scala.annotation.tailrec
 
 class ClassPathHandler(prefix: String,
                        classLoader: ClassLoaderContract,
@@ -22,7 +18,7 @@ class ClassPathHandler(prefix: String,
               None
             } else {
               val statusCode = 200
-              val body = inputStreamToBytes(inputStream)
+              val body = IoUtil.inputStreamToBytes(inputStream)
               val response = ResponseValue(statusCode, contentType, body)
               Some(response)
             }
@@ -44,23 +40,5 @@ class ClassPathHandler(prefix: String,
         Some(name.substring(lastDot))
       }
     maybeExtension
-  }
-
-  def inputStreamToBytes(inputStream: InputStream): Array[Byte] = {
-    val outputStream = new ByteArrayOutputStream
-    feedInputStreamToOutputStream(inputStream, outputStream)
-    val byteArray = outputStream.toByteArray
-    byteArray
-  }
-
-  def feedInputStreamToOutputStream(inputStream: InputStream, outputStream: OutputStream) {
-    @tailrec
-    def loop(byte: Int) {
-      if (byte != -1) {
-        outputStream.write(byte)
-        loop(inputStream.read())
-      }
-    }
-    loop(inputStream.read())
   }
 }

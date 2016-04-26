@@ -9,10 +9,11 @@ import org.scalatest.FunSuite
 test-driven-005
 Now that we have the jetty server running, we notice its handler is not implemented
 Since we don't have a container, lets add the ability to serve from the class path
+Not having a container makes it easier to get our application behavior under test coverage without overhead
 This forces us to design quite a bit of the domain, such as RequestValue, ResponseValue, and ContentType
 Note that this design is high level
 It does the minimal necessary to get enough information to compose a http response, without depending on jetty or the servlet api
-Since we have full logic test coverage at such a high level, there is no need to test implementation details such as RegexUtil
+Since we have full logic test coverage at such a high level, there is no need to test implementation details such as RegexUtil and IoUtil
 This frees us up to change the details as necessary without changing a bunch of tests
 If it turns out to be the case that some things are easier to test at the detail level to maintain full coverage, it is fine to write the more detailed tests once that is discovered
  */
