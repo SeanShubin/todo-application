@@ -10,8 +10,9 @@ This made us notice that JettyRunner depends on a port, so now we have to add co
 class CommandLineArgumentsValidatorTest extends FunSuite {
   test("valid configuration") {
     //given
-    val commandLineArguments = Seq("12345", "host", "23456")
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val commandLineArguments = Seq("12345", "host", "23456", "file-exists")
+    val filesThatExist = Set("file-exists")
+    val validator = createValidator(commandLineArguments, filesThatExist)
     //when
     val configuration = validator.validate()
     //then
@@ -23,7 +24,7 @@ class CommandLineArgumentsValidatorTest extends FunSuite {
   test("server port is required") {
     //given
     val commandLineArguments = Seq()
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val validator = createValidator(commandLineArguments)
     //when
     val exception = intercept[RuntimeException] {
       validator.validate()
@@ -35,7 +36,7 @@ class CommandLineArgumentsValidatorTest extends FunSuite {
   test("server port mut be an integer") {
     //given
     val commandLineArguments = Seq("blah")
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val validator = createValidator(commandLineArguments)
     //when
     val exception = intercept[RuntimeException] {
       validator.validate()
@@ -47,7 +48,7 @@ class CommandLineArgumentsValidatorTest extends FunSuite {
   test("database api host is required") {
     //given
     val commandLineArguments = Seq("12345")
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val validator = createValidator(commandLineArguments)
     //when
     val exception = intercept[RuntimeException] {
       validator.validate()
@@ -59,7 +60,7 @@ class CommandLineArgumentsValidatorTest extends FunSuite {
   test("database api port is required") {
     //given
     val commandLineArguments = Seq("12345", "host")
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val validator = createValidator(commandLineArguments)
     //when
     val exception = intercept[RuntimeException] {
       validator.validate()
@@ -71,12 +72,29 @@ class CommandLineArgumentsValidatorTest extends FunSuite {
   test("database api port is must be an integer") {
     //given
     val commandLineArguments = Seq("12345", "host", "blah")
-    val validator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val validator = createValidator(commandLineArguments)
     //when
     val exception = intercept[RuntimeException] {
       validator.validate()
     }
     //then
     assert(exception.getMessage === "In command line arguments at position 2, unable to convert value for 'database api port' to an integer, got 'blah'")
+  }
+
+  test("serve from directory must exist") {
+    //given
+    val commandLineArguments = Seq("12345", "host", "23456", "file-does-not-exist")
+    val validator = createValidator(commandLineArguments)
+    //when
+    val exception = intercept[RuntimeException] {
+      validator.validate()
+    }
+    //then
+    assert(exception.getMessage === "In command line arguments at position 3, value for 'serve from directory' must be a path that exists, got 'file-does-not-exist'")
+  }
+
+  def createValidator(commandLineArguments: Seq[String], filesThatExist: Set[String] = Set()): CommandLineArgumentsConfigurationValidator = {
+    val filesStub = new FilesStub(filesThatExist)
+    new CommandLineArgumentsConfigurationValidator(commandLineArguments, filesStub)
   }
 }

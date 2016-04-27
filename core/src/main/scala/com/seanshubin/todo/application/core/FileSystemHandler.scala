@@ -4,11 +4,11 @@ import java.nio.file.Path
 
 import com.seanshubin.todo.application.contract.FilesContract
 
-class FileSystemHandler(directory: Path,
+class FileSystemHandler(serveFromDirectory: Path,
                         files: FilesContract,
                         contentTypeByExtension: Map[String, ContentType]) extends ValueHandler {
   override def handle(request: RequestValue): Option[ResponseValue] = {
-    val file = directory.resolve(request.path)
+    val file = serveFromDirectory.resolve(removeLeadingForwardSlash(request.path))
     if (files.exists(file)) {
       val maybeExtension = getExtension(file.toString)
       maybeExtension match {
@@ -37,5 +37,10 @@ class FileSystemHandler(directory: Path,
       if (name.lastIndexOf('.') == -1) None
       else Some(name.substring(lastDot))
     maybeExtension
+  }
+
+  def removeLeadingForwardSlash(s: String): String = {
+    if (s.startsWith("/")) s.substring(1)
+    else throw new RuntimeException(s"Expected '$s' to start with a '/'")
   }
 }

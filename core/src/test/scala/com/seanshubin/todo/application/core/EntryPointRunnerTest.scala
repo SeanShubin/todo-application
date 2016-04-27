@@ -1,5 +1,7 @@
 package com.seanshubin.todo.application.core
 
+import java.nio.file.Paths
+
 import org.scalatest.FunSuite
 
 /*
@@ -23,14 +25,16 @@ class EntryPointRunnerTest extends FunSuite {
     val portString = "100"
     val host = "the-host"
     val apiPortString = "200"
-    val commandLineArguments = Seq(portString, host, apiPortString)
-    val configurationValidator: ConfigurationValidator = new CommandLineArgumentsConfigurationValidator(commandLineArguments)
+    val pathString = "the-path"
+    val commandLineArguments = Seq(portString, host, apiPortString, pathString)
+    val filesStub = new FilesStub(Set("the-path"))
+    val configurationValidator: ConfigurationValidator = new CommandLineArgumentsConfigurationValidator(commandLineArguments, filesStub)
     val createRunnerFixture = new CreateRunnerFixture
     val runner: Runnable = new EntryPointRunner(configurationValidator, createRunnerFixture.createRunner)
     //when
     runner.run()
     //then
-    assert(createRunnerFixture.runnerStub.actualConfiguration === Configuration(100, "the-host", 200))
+    assert(createRunnerFixture.runnerStub.actualConfiguration === Configuration(100, "the-host", 200, Paths.get(pathString)))
     assert(createRunnerFixture.runnerStub.invocations === 1)
   }
 
@@ -49,5 +53,4 @@ class EntryPointRunnerTest extends FunSuite {
 
     override def run(): Unit = invocations += 1
   }
-
 }
