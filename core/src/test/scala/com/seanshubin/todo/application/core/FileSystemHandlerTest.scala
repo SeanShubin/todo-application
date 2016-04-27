@@ -58,7 +58,7 @@ class FileSystemHandlerTest extends FunSuite {
       fileSystemHandler.handle(request)
     }
     //then
-    assert(exception.getMessage === "Unable to find extension for resources/serve-from-classpath/hello (needed to compute content type)")
+    assert(exception.getMessage === "Unable to find extension for /hello (needed to compute content type)")
   }
 
   def createFileSystemHandler(maybeFile: Option[FilePathAndContent]): FileSystemHandler = {

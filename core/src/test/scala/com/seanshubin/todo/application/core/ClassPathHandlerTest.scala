@@ -74,6 +74,6 @@ class ClassPathHandlerTest extends FunSuite {
       classPathHandler.handle(request)
     }
     //then
-    assert(exception.getMessage === "Unable to find extension for serve-from-classpath/hello (needed to compute content type)")
+    assert(exception.getMessage === "Unable to find extension for /hello (needed to compute content type)")
   }
 }
