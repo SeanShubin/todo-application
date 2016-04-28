@@ -19,7 +19,7 @@ define(function () {
             }
         },
         stringToLines: function (originalString) {
-            var splitLines = originalString.split(/\r\n|\r|\n/)
+            var splitLines = originalString.split(/\r\n|\r|\n/);
             if (splitLines.length === 1 && splitLines[0] === '') {
                 return [];
             } else {

@@ -1,5 +1,23 @@
-define(['text!./template.html', './http', './marshalling', './tasks', './node-util'], function (template, http, marshalling, tasks, nodeUtil) {
-    var body, addButton, clearButton, userInput, list, todoEntryTemplate, itemsListElement;
+define([
+    'text!todo-list-style-showcase.html',
+    'fake-http',
+    'marshalling',
+    'tasks',
+    'node-util'], function (template, http, marshalling, tasks, nodeUtil) {
+    var body, addButton, clearButton, userInput, todoEntryTemplate, itemsListElement;
+
+    http.addRequestResponsePair(
+        {
+            request: {
+                url: 'database/task',
+                method: 'GET'
+            },
+            response: {
+                status: 200,
+                body: '1 false Task A\n2 true Task B\n3 false Task C'
+            }
+        }
+    );
 
     function renderTemplateFromHttpResponse(response) {
         var lines = marshalling.stringToLines(response.body);
@@ -38,7 +56,7 @@ define(['text!./template.html', './http', './marshalling', './tasks', './node-ut
     }
 
     function getTasks() {
-        return http.getAsync({url: 'database/task'});
+        return http.sendAsync({method: "GET", url: 'database/task'});
     }
 
     function addButtonClick() {
@@ -113,12 +131,11 @@ define(['text!./template.html', './http', './marshalling', './tasks', './node-ut
         renderAt: function (attachTo) {
             body = attachTo;
             body.innerHTML = template;
-            addButton = lookupNodeByClass('add-todo-entry-button');
-            clearButton = lookupNodeByClass('todo-clear-done');
-            userInput = lookupNodeByClass('user-input');
-            list = lookupNodeByClass('todo-entries-list');
-            itemsListElement = lookupNodeByClass('todo-entries-list');
-            todoEntryTemplate = lookupNodeByClass('todo-entry');
+            addButton = lookupNodeByClass('button-add-task');
+            clearButton = lookupNodeByClass('button-clear-done');
+            userInput = lookupNodeByClass('input-task-name');
+            itemsListElement = lookupNodeByClass('list-tasks');
+            todoEntryTemplate = lookupNodeByClass('list-item-task');
             todoEntryTemplate.remove();
             setupEventHandling();
             refreshTasks();

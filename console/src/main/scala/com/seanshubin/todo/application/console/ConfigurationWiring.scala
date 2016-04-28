@@ -20,7 +20,7 @@ trait ConfigurationWiring {
     ".ico" -> ContentType("image/x-icon", None)
   )
   lazy val redirects: Map[String, String] = Map(
-    "/" -> "/todo-list-style-showcase.html"
+    "/" -> "/index.html"
   )
   lazy val classLoader: ClassLoader = getClass.getClassLoader
   lazy val classLoaderContract: ClassLoaderContract = new ClassLoaderDelegate(classLoader)
