@@ -23,8 +23,8 @@ class FileSystemHandlerTest extends FunSuite {
     val Some(response) = fileSystemHandler.handle(request)
     //then
     assert(response.statusCode === 200)
-    assert(response.contentType === ContentType("text/plain", Some(charset)))
-    assert(response.asText === "Hello, world!")
+    assert(response.headers === Seq("Content-Type" -> "text/plain; charset=UTF-8"))
+    assert(response.bytes === "Hello, world!".getBytes(charset))
   }
 
   test("not found in file system") {

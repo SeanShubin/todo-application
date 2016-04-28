@@ -11,7 +11,11 @@ class HandlerAdapter(delegate: ValueHandler) extends AbstractHandler {
     val maybeResponseValue = delegate.handle(requestValue)
     maybeResponseValue match {
       case Some(responseValue) =>
-        response.addHeader("Content-Type", responseValue.contentType.toString)
+        for {
+          (name, value) <- responseValue.headers
+        } {
+          response.addHeader(name, value)
+        }
         response.setStatus(responseValue.statusCode)
         IoUtil.bytesToOutputStream(responseValue.bytes, response.getOutputStream)
         baseRequest.setHandled(true)

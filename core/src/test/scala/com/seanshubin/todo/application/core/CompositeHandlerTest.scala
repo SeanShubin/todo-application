@@ -1,5 +1,6 @@
 package com.seanshubin.todo.application.core
 
+import com.seanshubin.todo.application.core.ResponseValue.ContentResponse
 import org.scalatest.FunSuite
 
 class CompositeHandlerTest extends FunSuite {
@@ -17,8 +18,8 @@ class CompositeHandlerTest extends FunSuite {
 
   test("both handlers set, return first") {
     //given
-    val responseA = ResponseValue(200, ContentType("response a", maybeCharset = None), Seq())
-    val responseB = ResponseValue(200, ContentType("response b", maybeCharset = None), Seq())
+    val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
+    val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
     val handlerA = new StubHandler(Some(responseA))
     val handlerB = new StubHandler(Some(responseB))
     val compositeHandler = new CompositeHandler(handlerA, handlerB)
@@ -31,7 +32,7 @@ class CompositeHandlerTest extends FunSuite {
 
   test("only first handler set") {
     //given
-    val responseA = ResponseValue(200, ContentType("response a", maybeCharset = None), Seq())
+    val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
     val handlerA = new StubHandler(Some(responseA))
     val handlerB = new StubHandler(None)
     val compositeHandler = new CompositeHandler(handlerA, handlerB)
@@ -44,7 +45,7 @@ class CompositeHandlerTest extends FunSuite {
 
   test("only second handler set") {
     //given
-    val responseB = ResponseValue(200, ContentType("response b", maybeCharset = None), Seq())
+    val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
     val handlerA = new StubHandler(None)
     val handlerB = new StubHandler(Some(responseB))
     val compositeHandler = new CompositeHandler(handlerA, handlerB)

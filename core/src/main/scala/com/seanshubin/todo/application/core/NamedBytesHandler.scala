@@ -15,7 +15,7 @@ abstract class NamedBytesHandler(contentTypeByExtension: Map[String, ContentType
             maybeBytes.map {
               bytes =>
                 val statusCode = 200
-                val response = ResponseValue(statusCode, contentType, bytes)
+                val response = ResponseValue.ContentResponse(statusCode, contentType, bytes)
                 response
             }
           case None =>

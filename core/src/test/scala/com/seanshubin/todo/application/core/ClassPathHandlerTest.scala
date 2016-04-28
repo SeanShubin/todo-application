@@ -33,8 +33,7 @@ class ClassPathHandlerTest extends FunSuite {
     val Some(response) = classPathHandler.handle(request)
     //then
     assert(response.statusCode === 200)
-    assert(response.contentType === ContentType("text/plain", Some(charset)))
-    assert(response.asText === "Hello, world!")
+    assert(response.headers === Seq("Content-Type" -> "text/plain; charset=UTF-8"))
   }
 
   test("not found in class path") {

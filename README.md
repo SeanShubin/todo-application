@@ -13,6 +13,10 @@
 
 ## Design Principles
 - Top Down Design
+- Agile Design
+    - Unplanned design leads to spaghetti code
+    - Planned design leads to a bunch of stuff you don't need
+    - Agile design allows the design to evolve as needed
 - Test Driven Design
 - Design by Contract
 - No mocks

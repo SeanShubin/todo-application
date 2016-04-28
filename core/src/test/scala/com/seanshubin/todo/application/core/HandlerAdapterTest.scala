@@ -3,6 +3,7 @@ package com.seanshubin.todo.application.core
 import java.nio.charset.{Charset, StandardCharsets}
 import javax.servlet.{ServletOutputStream, WriteListener}
 
+import com.seanshubin.todo.application.core.ResponseValue.ContentResponse
 import org.eclipse.jetty.server.{HttpChannel, HttpInput, Request}
 import org.scalatest.FunSuite
 
@@ -39,7 +40,7 @@ class HandlerAdapterTest extends FunSuite {
     //given
     val charset = StandardCharsets.UTF_8
     val helloBytes = "hello".getBytes(charset)
-    val maybeResponseValue = Some(ResponseValue(200, ContentType("text/plain", Some(charset)), helloBytes))
+    val maybeResponseValue = Some(ContentResponse(200, ContentType("text/plain", Some(charset)), helloBytes))
     val valueHandler = new StubValueHandler(maybeResponseValue)
     val handlerAdapter = new HandlerAdapter(valueHandler)
     val target = "target"
