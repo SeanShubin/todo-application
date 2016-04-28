@@ -50,7 +50,7 @@ define([
 
     function createTaskElement(options) {
         var node = options.template.cloneNode(true);
-        var nameNode = nodeUtil.classNameToSingleElement({node: node, className: 'todo-name'});
+        var nameNode = nodeUtil.classNameToSingleElement({node: node, className: 'label-task-name'});
         nameNode.innerHTML = options.task.name;
         return node;
     }
@@ -76,20 +76,20 @@ define([
 
     function addTask(newTaskName) {
         var command = 'add ' + newTaskName;
-        var request = {url: 'database/task-event', body: command};
+        var request = {method: 'POST', url: 'database/task-event', body: command};
 
         function updateGui(response) {
             var task = parseTaskLine(response.body);
             addTaskToGui(task)
         }
 
-        http.postAsync(request).then(updateGui);
+        http.sendAsync(request).then(updateGui);
     }
 
     function addTaskToGui(task) {
         var taskElement = createTaskElement({template: todoEntryTemplate, task: task});
         taskElement.classList.add('task-' + task.id);
-        var doneCheckbox = nodeUtil.classNameToSingleElement({node: taskElement, className: 'todo-done'});
+        var doneCheckbox = nodeUtil.classNameToSingleElement({node: taskElement, className: 'checkbox-task-done'});
         doneCheckbox.checked = task.done;
         function doneCheckboxPressed() {
             var commandPrefix;
@@ -99,8 +99,8 @@ define([
                 commandPrefix = 'undone';
             }
             var command = commandPrefix + ' ' + task.id;
-            var request = {url: 'database/task-event', body: command};
-            http.postAsync(request);
+            var request = {method: 'POST', url: 'database/task-event', body: command};
+            http.sendAsync(request);
         }
 
         doneCheckbox.addEventListener('change', doneCheckboxPressed);
@@ -122,9 +122,9 @@ define([
     }
 
     function clearButtonClick() {
-        var request = {url: 'database/task-event', body: 'clear'};
+        var request = {method: 'POST', url: 'database/task-event', body: 'clear'};
         userInput.focus();
-        http.postAsync(request).then(refreshTasks);
+        http.sendAsync(request).then(refreshTasks);
     }
 
     return {

@@ -1,6 +1,7 @@
 package com.seanshubin.todo.application.console
 
 import java.nio.charset.{Charset, StandardCharsets}
+import java.nio.file.Path
 
 import com.seanshubin.todo.application.contract.{ClassLoaderContract, ClassLoaderDelegate, FilesContract, FilesDelegate}
 import com.seanshubin.todo.application.core._
@@ -9,8 +10,8 @@ import org.eclipse.jetty.server.Handler
 trait ConfigurationWiring {
   def configuration: Configuration
 
-  lazy val serveFromClasspathPrefix = "serve-from-classpath"
-  lazy val serveFromDirectory = configuration.serveFromDirectory
+  lazy val serveFromClasspathPrefix: String = "serve-from-classpath"
+  lazy val serveFromDirectory: Path = configuration.serveFromDirectory
   lazy val charset: Charset = StandardCharsets.UTF_8
   lazy val contentTypeByExtension: Map[String, ContentType] = Map(
     ".js" -> ContentType("text/javascript", Some(charset)),
