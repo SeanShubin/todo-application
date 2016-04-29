@@ -7,23 +7,65 @@
 </head>
 <body>
 <script type="application/javascript">
-    var sendHttp = function (options) {
+    var createXhrDelegate = function (xhr) {
+        return {
+            delegate: xhr,
+            open: function (method, url) {
+                console.log('open: ' + JSON.stringify(arguments));
+                xhr.open(method, url)
+            },
+            setRequestHeader: function (header, value) {
+                console.log('setRequestHeader: ' + JSON.stringify(arguments));
+                xhr.setRequestHeader(header, value)
+            },
+            setOnreadystatechange: function (eventHandler) {
+                console.log('setOnreadystatechange: ' + JSON.stringify(arguments));
+                function loggingEventHandler(){
+                    console.log('eventHandler: ' + JSON.stringify(arguments));
+                    console.log('  readyState: ' + JSON.stringify(xhr.readyState));
+                    console.log('  status: ' + JSON.stringify(xhr.status));
+                    eventHandler(arguments)
+                }
+                xhr.onreadystatechange = loggingEventHandler;
+            },
+            send: function (data) {
+                console.log('send: ' + JSON.stringify(arguments));
+                xhr.send(data)
+            },
+            getReadyState: function () {
+                var readyState = xhr.readyState;
+                console.log('getReadyState: ' + readyState);
+                return readyState;
+            },
+            getStatus: function () {
+                var status = xhr.status;
+                console.log('getStatus: ' + status);
+                return status;
+            },
+            getResponseText: function () {
+                var responseText = xhr.responseText;
+                console.log('getResponseText: ' + responseText);
+                return responseText;
+            }
+        }
+    };
+
+    var sendUtf8 = function (options) {
         return new Promise(function (resolve) {
-            var client = new XMLHttpRequest();
-            client.open(options.method, options.url);
-            client.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
-            client.onreadystatechange = executePromise;
-            client.send(options.body);
+            options.xhr.open(options.method, options.url);
+            options.xhr.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
+            options.xhr.setOnreadystatechange(executePromise);
+            options.xhr.send(options.body);
             function executePromise() {
-                if (client.readyState === XMLHttpRequest.DONE) {
-                    resolve({status: client.status, body: client.responseText});
+                if (options.xhr.getReadyState() === XMLHttpRequest.DONE) {
+                    resolve({status: options.xhr.getStatus(), body: options.xhr.getResponseText()});
                 }
             }
         });
     };
 
     var addParagraph = function (text) {
-        var node = document.createElement('p');
+        var node = document.createElement('pre');
         node.innerHTML = text;
         document.body.appendChild(node);
     };
@@ -32,7 +74,46 @@
         addParagraph(response.body);
     };
 
-    sendHttp({method: "GET", url: "http://www.google.com"}).then(handleResponse);
+    var realXhr = createXhrDelegate(new XMLHttpRequest());
+    var fakeXhrDelegate = {
+        open: function (method, url) {
+            xhr.open(method, url)
+        },
+        setRequestHeader: function (header, value) {
+            xhr.setRequestHeader(header, value)
+        },
+        setOnreadystatechange: function (eventHandler) {
+            xhr.onreadystatechange = eventHandler
+        },
+        send: function (data) {
+            xhr.send(data)
+        },
+        getReadyState: function () {
+            return xhr.readyState
+        },
+        getStatus: function () {
+            return xhr.status
+        },
+        getResponseText: function () {
+            return xhr.responseText
+        }
+    };
+
+
+
+    sendUtf8({xhr: realXhr, method: "GET", url: "sample-text-1.txt"}).then(handleResponse);
+    sendUtf8({xhr: realXhr, method: "GET", url: "sample-text-2.txt"}).then(handleResponse);
 </script>
 </body>
 </html>
+<!--open: {"0":"GET","1":"style.css"}-->
+<!--setRequestHeader: {"0":"Content-Type","1":"text/plain; charset=utf-8"}-->
+<!--setOnreadystatechange: {}-->
+<!--send: {}-->
+<!--eventHandler: {"0":{"isTrusted":true}}-->
+<!--getReadyState: 2-->
+<!--eventHandler: {"0":{"isTrusted":true}}-->
+<!--getReadyState: 3-->
+<!--eventHandler: {"0":{"isTrusted":true}}-->
+<!--getReadyState: 4-->
+<!--getStatus: 200-->
