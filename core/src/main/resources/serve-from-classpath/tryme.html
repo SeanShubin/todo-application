@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<script type="application/javascript">
+    var sendHttp = function (options) {
+        return new Promise(function (resolve) {
+            var client = new XMLHttpRequest();
+            client.open(options.method, options.url);
+            client.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
+            client.onreadystatechange = executePromise;
+            client.send(options.body);
+            function executePromise() {
+                if (client.readyState === XMLHttpRequest.DONE) {
+                    resolve({status: client.status, body: client.responseText});
+                }
+            }
+        });
+    };
+
+    var addParagraph = function (text) {
+        var node = document.createElement('p');
+        node.innerHTML = text;
+        document.body.appendChild(node);
+    };
+
+    var handleResponse = function (response) {
+        addParagraph(response.body);
+    };
+
+    sendHttp({method: "GET", url: "http://www.google.com"}).then(handleResponse);
+</script>
+</body>
+</html>
