@@ -14,6 +14,7 @@ define([], function () {
             for (task of tasks) {
                 addTaskToGui(task);
             }
+            return Promise.resolve(body);
         };
 
         var removeTasksFromGui = function () {
@@ -115,21 +116,22 @@ define([], function () {
             http.sendAsync(request).then(refreshTasks);
         };
 
-        return {
-            renderAt: function (attachTo) {
-                body = attachTo;
-                body.innerHTML = template;
-                addButton = lookupNodeByClass('button-add-task');
-                clearButton = lookupNodeByClass('button-clear-done');
-                userInput = lookupNodeByClass('input-task-name');
-                itemsListElement = lookupNodeByClass('list-tasks');
-                todoEntryTemplate = lookupNodeByClass('list-item-task');
-                todoEntryTemplate.remove();
-                setupEventHandling();
-                refreshTasks();
-            }
+        var render = function () {
+            body = document.createElement('div');
+            body.innerHTML = template;
+            addButton = lookupNodeByClass('button-add-task');
+            clearButton = lookupNodeByClass('button-clear-done');
+            userInput = lookupNodeByClass('input-task-name');
+            itemsListElement = lookupNodeByClass('list-tasks');
+            todoEntryTemplate = lookupNodeByClass('list-item-task');
+            todoEntryTemplate.remove();
+            setupEventHandling();
+            return refreshTasks();
         };
 
+        return {
+            render: render
+        };
     };
     return constructor;
 
