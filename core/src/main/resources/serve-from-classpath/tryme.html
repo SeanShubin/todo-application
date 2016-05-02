@@ -20,12 +20,13 @@
             },
             setOnreadystatechange: function (eventHandler) {
                 console.log('setOnreadystatechange: ' + JSON.stringify(arguments));
-                function loggingEventHandler(){
+                function loggingEventHandler() {
                     console.log('eventHandler: ' + JSON.stringify(arguments));
                     console.log('  readyState: ' + JSON.stringify(xhr.readyState));
                     console.log('  status: ' + JSON.stringify(xhr.status));
                     eventHandler(arguments)
                 }
+
                 xhr.onreadystatechange = loggingEventHandler;
             },
             send: function (data) {
@@ -98,7 +99,6 @@
             return xhr.responseText
         }
     };
-
 
 
     sendUtf8({xhr: realXhr, method: "GET", url: "sample-text-1.txt"}).then(handleResponse);

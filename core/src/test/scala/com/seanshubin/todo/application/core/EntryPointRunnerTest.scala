@@ -53,4 +53,5 @@ class EntryPointRunnerTest extends FunSuite {
 
     override def run(): Unit = invocations += 1
   }
+
 }
