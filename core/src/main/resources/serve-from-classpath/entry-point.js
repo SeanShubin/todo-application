@@ -27,8 +27,9 @@ define([
             nodeUtil: createNodeUtil(),
             template: template
         });
-        tasks.render().then(function (dom) {
+        var appendRenderedTasks = function (dom) {
             document.body.appendChild(dom);
-        });
+        };
+        tasks.render().then(appendRenderedTasks);
     }
 );

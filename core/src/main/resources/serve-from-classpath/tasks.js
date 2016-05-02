@@ -129,9 +129,10 @@ define([], function () {
             return refreshTasks();
         };
 
-        return {
+        var contract = {
             render: render
         };
+        return contract;
     };
     return constructor;
 

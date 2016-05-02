@@ -14,23 +14,27 @@ define(function () {
             }
             return -1;
         };
-        return {
-            addRequestResponsePair: function (requestResponsePair) {
-                requestResponsePairs.push(requestResponsePair);
-            },
-            unconsumedRequestResponsePairs: function () {
-                return requestResponsePairs;
-            },
-            sendAsync: function (request) {
-                var responseIndex = requestToResponseIndex(request);
-                if (responseIndex === -1) {
-                    return Promise.reject('unexpected request: ' + JSON.stringify(request));
-                } else {
-                    var response = requestResponsePairs.splice(responseIndex, 1)[0].response;
-                    return Promise.resolve(response);
-                }
+        var addRequestResponsePair = function (requestResponsePair) {
+            requestResponsePairs.push(requestResponsePair);
+        };
+        var unconsumedRequestResponsePairs = function () {
+            return requestResponsePairs;
+        };
+        var syndAsync = function (request) {
+            var responseIndex = requestToResponseIndex(request);
+            if (responseIndex === -1) {
+                return Promise.reject('unexpected request: ' + JSON.stringify(request));
+            } else {
+                var response = requestResponsePairs.splice(responseIndex, 1)[0].response;
+                return Promise.resolve(response);
             }
-        }
+        };
+        var contract = {
+            addRequestResponsePair: addRequestResponsePair,
+            unconsumedRequestResponsePairs: unconsumedRequestResponsePairs,
+            sendAsync: syndAsync
+        };
+        return contract;
     };
     return constructor;
 });
