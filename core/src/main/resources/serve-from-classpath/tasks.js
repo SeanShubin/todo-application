@@ -1,5 +1,5 @@
-define([], function () {
-    var constructor = function (collaborators) {
+define([], () => {
+    var constructor = collaborators => {
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
         var nodeUtil = collaborators.nodeUtil;
@@ -7,7 +7,7 @@ define([], function () {
 
         var body, addButton, clearButton, userInput, todoEntryTemplate, itemsListElement;
 
-        var renderTemplateFromHttpResponse = function (response) {
+        var renderTemplateFromHttpResponse = response => {
             var lines = marshalling.stringToLines(response.body);
             var tasks = lines.map(parseTaskLine);
             removeTasksFromGui();
@@ -17,13 +17,13 @@ define([], function () {
             return Promise.resolve(body);
         };
 
-        var removeTasksFromGui = function () {
+        var removeTasksFromGui = () => {
             while (itemsListElement.firstChild) {
                 itemsListElement.removeChild(itemsListElement.firstChild);
             }
         };
 
-        var parseTaskLine = function (line) {
+        var parseTaskLine = line => {
             var regex = /(\d+) (true|false) (.*)/;
             var parts = regex.exec(line);
             var id = marshalling.stringToInt(parts[1]);
@@ -37,18 +37,18 @@ define([], function () {
             return task;
         };
 
-        var createTaskElement = function (options) {
+        var createTaskElement = options => {
             var node = options.template.cloneNode(true);
             var nameNode = nodeUtil.classNameToSingleElement({node: node, className: 'label-task-name'});
             nameNode.innerHTML = options.task.name;
             return node;
         };
 
-        var getTasks = function () {
+        var getTasks = () => {
             return http.sendAsync({method: "GET", url: 'database/task'});
         };
 
-        var addButtonClick = function () {
+        var addButtonClick = () => {
             var newTaskName = userInput.value;
             if (userInput.value !== '') {
                 userInput.value = '';
@@ -57,17 +57,17 @@ define([], function () {
             }
         };
 
-        var userInputKeyUp = function (event) {
+        var userInputKeyUp = event => {
             if (event.which === 13) {
                 addButtonClick();
             }
         };
 
-        var addTask = function (newTaskName) {
+        var addTask = newTaskName => {
             var command = 'add ' + newTaskName;
             var request = {method: 'POST', url: 'database/task-event', body: command};
 
-            var updateGui = function (response) {
+            var updateGui = response => {
                 var task = parseTaskLine(response.body);
                 addTaskToGui(task)
             };
@@ -75,12 +75,12 @@ define([], function () {
             http.sendAsync(request).then(updateGui);
         };
 
-        var addTaskToGui = function (task) {
+        var addTaskToGui = task => {
             var taskElement = createTaskElement({template: todoEntryTemplate, task: task});
             taskElement.classList.add('task-' + task.id);
             var doneCheckbox = nodeUtil.classNameToSingleElement({node: taskElement, className: 'checkbox-task-done'});
             doneCheckbox.checked = task.done;
-            var doneCheckboxPressed = function () {
+            var doneCheckboxPressed = () => {
                 var commandPrefix;
                 if (doneCheckbox.checked) {
                     commandPrefix = 'done';
@@ -96,27 +96,27 @@ define([], function () {
             itemsListElement.appendChild(taskElement);
         };
 
-        var refreshTasks = function () {
+        var refreshTasks = () => {
             return getTasks().then(renderTemplateFromHttpResponse);
         };
 
-        var setupEventHandling = function () {
+        var setupEventHandling = () => {
             addButton.addEventListener("click", addButtonClick);
             userInput.addEventListener("keyup", userInputKeyUp);
             clearButton.addEventListener("click", clearButtonClick)
         };
 
-        var lookupNodeByClass = function (className) {
+        var lookupNodeByClass = className => {
             return nodeUtil.classNameToSingleElement({node: body, className: className});
         };
 
-        var clearButtonClick = function () {
+        var clearButtonClick = () => {
             var request = {method: 'POST', url: 'database/task-event', body: 'clear'};
             userInput.focus();
             http.sendAsync(request).then(refreshTasks);
         };
 
-        var render = function () {
+        var render = () => {
             body = document.createElement('div');
             body.innerHTML = template;
             addButton = lookupNodeByClass('button-add-task');
@@ -135,5 +135,4 @@ define([], function () {
         return contract;
     };
     return constructor;
-
 });
