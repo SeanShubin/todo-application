@@ -1,7 +1,27 @@
 define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
     (qunit, createTasks, createHttp, createMarshalling, createNodeUtil, template) => {
         'use strict';
-
+        var marshalling = createMarshalling();
+        var httpGetNoTasks = {
+            request: {
+                url: 'database/task',
+                method: 'GET'
+            },
+            response: {
+                status: 200,
+                body: ''
+            }
+        };
+        var httpGetThreeSampleTasks = {
+            request: {
+                url: 'database/task',
+                method: 'GET'
+            },
+            response: {
+                status: 200,
+                body: '1 false Task A\n2 true Task B\n3 false Task C'
+            }
+        };
         var selectExactlyOne = (dom, selector) => {
             var nodes = dom.querySelectorAll(selector);
             if (nodes.length === 1) {
@@ -21,21 +41,10 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
         };
 
         var createHelper = () => {
-            var http = createHttp([
-                {
-                    request: {
-                        url: 'database/task',
-                        method: 'GET'
-                    },
-                    response: {
-                        status: 200,
-                        body: ''
-                    }
-                }
-            ]);
+            var http = createHttp();
             var tasks = createTasks({
                 http: http,
-                marshalling: createMarshalling(),
+                marshalling: marshalling,
                 nodeUtil: createNodeUtil(),
                 template: template
             });
@@ -49,12 +58,20 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             var userTypesTaskName = taskName => {
                 selectExactlyOne(dom, '.input-task-name').value = taskName;
             };
-            var addHttpCall = requestResponsePair => {
-                http.addRequestResponsePair(requestResponsePair);
+            var taskElementToTask = taskElement => {
+                var name = selectExactlyOne(taskElement, '.label-task-name').textContent;
+                var done = isChecked(taskElement, '.checkbox-task-done');
+                var id = marshalling.stringToInt(taskElement.dataset.id);
+                return {
+                    id: id,
+                    name: name,
+                    done: done
+                };
             };
             var tasksDisplayedToUser = () => {
-                console.log(dom);
-                return [];
+                var taskElements = dom.querySelectorAll('.list-item-task');
+                var tasks = Array.prototype.map.call(taskElements, taskElementToTask);
+                return tasks;
             };
             var contract = {
                 render: render,
@@ -71,18 +88,8 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
         };
 
         qunit.test("render empty", assert => {
-            var http = createHttp([
-                {
-                    request: {
-                        url: 'database/task',
-                        method: 'GET'
-                    },
-                    response: {
-                        status: 200,
-                        body: ''
-                    }
-                }
-            ]);
+            var http = createHttp();
+            http.addRequestResponsePair(httpGetNoTasks);
             var tasks = createTasks({
                 http: http,
                 marshalling: createMarshalling(),
@@ -104,18 +111,8 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
         });
 
         qunit.test("render tasks", assert => {
-            var http = createHttp([
-                {
-                    request: {
-                        url: 'database/task',
-                        method: 'GET'
-                    },
-                    response: {
-                        status: 200,
-                        body: '1 false Task A\n2 true Task B\n3 false Task C'
-                    }
-                }
-            ]);
+            var http = createHttp();
+            http.addRequestResponsePair(httpGetThreeSampleTasks);
             var tasks = createTasks({
                 http: http,
                 marshalling: createMarshalling(),
@@ -127,12 +124,12 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             tasks.render().then(dom => {
                 // document.body.appendChild(dom);
                 assert.equal(dom.querySelectorAll('.list-item-task').length, 3, '3 tasks');
-                assert.equal(selectExactlyOne(dom, '.task-1 .label-task-name').textContent, 'Task A', 'Task A found');
-                assert.notOk(isChecked(dom, '.task-1 .checkbox-task-done'), 'Task A not checked');
-                assert.equal(selectExactlyOne(dom, '.task-2 .label-task-name').textContent, 'Task B', 'Task B found');
-                assert.ok(isChecked(dom, '.task-2 .checkbox-task-done'), 'Task B checked');
-                assert.equal(selectExactlyOne(dom, '.task-3 .label-task-name').textContent, 'Task C', 'Task C found');
-                assert.notOk(isChecked(dom, '.task-3 .checkbox-task-done'), 'Task C not checked');
+                assert.equal(selectExactlyOne(dom, '[data-id="1"] .label-task-name').textContent, 'Task A', 'Task A found');
+                assert.notOk(isChecked(dom, '[data-id="1"] .checkbox-task-done'), 'Task A not checked');
+                assert.equal(selectExactlyOne(dom, '[data-id="2"] .label-task-name').textContent, 'Task B', 'Task B found');
+                assert.ok(isChecked(dom, '[data-id="2"] .checkbox-task-done'), 'Task B checked');
+                assert.equal(selectExactlyOne(dom, '[data-id="3"] .label-task-name').textContent, 'Task C', 'Task C found');
+                assert.notOk(isChecked(dom, '[data-id="3"] .checkbox-task-done'), 'Task C not checked');
                 assert.equal(http.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 done();
             });
@@ -140,6 +137,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("add item", assert => {
             var helper = createHelper();
+            helper.addRequestResponsePair(httpGetNoTasks);
             var addUser = () => {
                 helper.userTypesTaskName('Some Task');
                 helper.addRequestResponsePair({
@@ -158,8 +156,11 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             assert.expect(2);
             var done = assert.async();
             var verify = () => {
-                console.log(helper.getDom());
-                assert.deepEqual(helper.tasksDisplayedToUser(), {id: 1, name: 'Some Task', done: false}, 'Added task');
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'Some Task',
+                    done: false
+                }], 'Added task');
                 assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 done();
             };

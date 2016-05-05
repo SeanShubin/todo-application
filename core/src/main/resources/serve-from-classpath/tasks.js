@@ -79,7 +79,7 @@ define([], () => {
 
         var addTaskToGui = task => {
             var taskElement = createTaskElement({template: todoEntryTemplate, task: task});
-            taskElement.classList.add('task-' + task.id);
+            taskElement.setAttribute('data-id', task.id);
             var doneCheckbox = nodeUtil.classNameToSingleElement({node: taskElement, className: 'checkbox-task-done'});
             doneCheckbox.checked = task.done;
             var doneCheckboxPressed = () => {

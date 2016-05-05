@@ -1,5 +1,6 @@
 define(function () {
-    var constructor = function (requestResponsePairs) {
+    var constructor = function () {
+        var requestResponsePairs = [];
         var requestsEqual = function (left, right) {
             if (left.url !== right.url) return false;
             if (left.method !== right.method) return false;
