@@ -53,7 +53,9 @@ define([], () => {
             if (userInput.value !== '') {
                 userInput.value = '';
                 userInput.focus();
-                addTask(newTaskName);
+                return addTask(newTaskName);
+            } else {
+                return Promise.reject();
             }
         };
 
@@ -72,7 +74,7 @@ define([], () => {
                 addTaskToGui(task)
             };
 
-            http.sendAsync(request).then(updateGui);
+            return http.sendAsync(request).then(updateGui);
         };
 
         var addTaskToGui = task => {
@@ -130,7 +132,8 @@ define([], () => {
         };
 
         var contract = {
-            render: render
+            render: render,
+            addButtonClick: addButtonClick
         };
         return contract;
     };

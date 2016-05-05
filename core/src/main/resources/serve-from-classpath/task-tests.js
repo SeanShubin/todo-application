@@ -44,7 +44,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                 return tasks.render().then(renderedDom => dom = renderedDom)
             };
             var userPressesAddTaskButton = () => {
-                return Promise.resolve();
+                return tasks.addButtonClick();
             };
             var userTypesTaskName = taskName => {
                 selectExactlyOne(dom, '.input-task-name').value = taskName;
@@ -59,13 +59,12 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             var contract = {
                 render: render,
                 userTypesTaskName: userTypesTaskName,
-                addHttpCall: () => {
-                },
+                addRequestResponsePair: http.addRequestResponsePair,
                 userPressesAddTaskButton: userPressesAddTaskButton,
                 tasksDisplayedToUser: tasksDisplayedToUser,
-                noMoreHttpCalls: () => {
-                },
-                httpCallsMessage: () => {
+                unconsumedRequestResponsePairs: http.unconsumedRequestResponsePairs,
+                getDom: () => {
+                    return dom;
                 }
             };
             return contract;
@@ -143,9 +142,9 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             var helper = createHelper();
             var addUser = () => {
                 helper.userTypesTaskName('Some Task');
-                helper.addHttpCall({
+                helper.addRequestResponsePair({
                     request: {
-                        url: 'database/task',
+                        url: 'database/task-event',
                         method: 'POST',
                         body: 'add Some Task'
                     },
@@ -156,11 +155,12 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                 });
                 return helper.userPressesAddTaskButton();
             };
-            assert.expect(8);
+            assert.expect(2);
             var done = assert.async();
             var verify = () => {
+                console.log(helper.getDom());
                 assert.deepEqual(helper.tasksDisplayedToUser(), {id: 1, name: 'Some Task', done: false}, 'Added task');
-                assert.ok(helper.noMoreHttpCalls(), helper.httpCallsMessage());
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 done();
             };
             helper.render().then(addUser).then(verify);
