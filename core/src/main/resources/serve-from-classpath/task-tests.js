@@ -12,16 +12,6 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                 body: ''
             }
         };
-        var httpGetThreeSampleTasks = {
-            request: {
-                url: 'database/task',
-                method: 'GET'
-            },
-            response: {
-                status: 200,
-                body: '1 false Task A\n2 true Task B\n3 false Task C'
-            }
-        };
         var selectExactlyOne = (dom, selector) => {
             var nodes = dom.querySelectorAll(selector);
             if (nodes.length === 1) {
@@ -40,6 +30,20 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             return dom.querySelectorAll(selector + ':checked').length === 1
         };
 
+        var toggleCheckbox = checkbox => {
+            checkbox.checked = !checkbox.checked;
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("change", false, true);
+            return checkbox.dispatchEvent(event);
+        };
+
+        var sendKeyUp = (target, key) => {
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("keyup", false, true);
+            event.which = key;
+            return target.dispatchEvent(event);
+        };
+
         var createHelper = () => {
             var http = createHttp();
             var tasks = createTasks({
@@ -55,8 +59,19 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             var userPressesAddTaskButton = () => {
                 return tasks.addButtonClick();
             };
+            var userPressesClearDoneButton = () => {
+                return tasks.clearButtonClick();
+            };
+            var userTogglesDoneCheckboxForId = id => {
+                var element = selectExactlyOne(dom, '[data-id="' + id + '"] .checkbox-task-done');
+                return toggleCheckbox(element);
+            };
             var userTypesTaskName = taskName => {
                 selectExactlyOne(dom, '.input-task-name').value = taskName;
+            };
+            var userPressesKey = whichKey => {
+                var element = selectExactlyOne(dom, '.input-task-name');
+                return sendKeyUp(element, whichKey);
             };
             var taskElementToTask = taskElement => {
                 var name = selectExactlyOne(taskElement, '.label-task-name').textContent;
@@ -78,64 +93,70 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                 userTypesTaskName: userTypesTaskName,
                 addRequestResponsePair: http.addRequestResponsePair,
                 userPressesAddTaskButton: userPressesAddTaskButton,
+                userPressesClearDoneButton: userPressesClearDoneButton,
+                userTogglesDoneCheckboxForId: userTogglesDoneCheckboxForId,
+                userPressesKey: userPressesKey,
                 tasksDisplayedToUser: tasksDisplayedToUser,
-                unconsumedRequestResponsePairs: http.unconsumedRequestResponsePairs,
-                getDom: () => {
-                    return dom;
-                }
+                unconsumedRequestResponsePairs: http.unconsumedRequestResponsePairs
             };
             return contract;
         };
 
         qunit.test("render empty", assert => {
-            var http = createHttp();
-            http.addRequestResponsePair(httpGetNoTasks);
-            var tasks = createTasks({
-                http: http,
-                marshalling: createMarshalling(),
-                nodeUtil: createNodeUtil(),
-                template: template
-            });
-            assert.expect(7);
+            var helper = createHelper();
+            helper.addRequestResponsePair(httpGetNoTasks);
+            assert.expect(8);
             var done = assert.async();
-            tasks.render().then(dom => {
+            var verify = dom => {
                 assert.equal(dom.querySelectorAll('.list-item-task').length, 0, 'No tasks');
-                assert.equal(http.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 assert.equal(selectExactlyOne(dom, 'h1').textContent, 'Todo List', 'title');
                 assert.equal(selectExactlyOne(dom, '.input-task-name').value, '', 'task name starts out empty');
                 assert.equal(selectExactlyOne(dom, '.button-add-task').innerText, 'Add Task', 'add task button exists');
                 assert.equal(howManyExist(dom, '.list-tasks'), 1, 'task list exists');
                 assert.equal(selectExactlyOne(dom, '.button-clear-done').innerText, 'Clear Done', 'clear done button exists');
+                assert.deepEqual(helper.tasksDisplayedToUser(), [], 'Added task');
                 done();
-            });
+            };
+            helper.render().then(verify);
         });
 
         qunit.test("render tasks", assert => {
-            var http = createHttp();
-            http.addRequestResponsePair(httpGetThreeSampleTasks);
-            var tasks = createTasks({
-                http: http,
-                marshalling: createMarshalling(),
-                nodeUtil: createNodeUtil(),
-                template: template
-            });
-            assert.expect(8);
+            var helper = createHelper();
+            var httpGetThreeSampleTasks = {
+                request: {
+                    url: 'database/task',
+                    method: 'GET'
+                },
+                response: {
+                    status: 200,
+                    body: '1 false Task A\n2 true Task B\n3 false Task C'
+                }
+            };
+            helper.addRequestResponsePair(httpGetThreeSampleTasks);
+            assert.expect(2);
             var done = assert.async();
-            tasks.render().then(dom => {
-                // document.body.appendChild(dom);
-                assert.equal(dom.querySelectorAll('.list-item-task').length, 3, '3 tasks');
-                assert.equal(selectExactlyOne(dom, '[data-id="1"] .label-task-name').textContent, 'Task A', 'Task A found');
-                assert.notOk(isChecked(dom, '[data-id="1"] .checkbox-task-done'), 'Task A not checked');
-                assert.equal(selectExactlyOne(dom, '[data-id="2"] .label-task-name').textContent, 'Task B', 'Task B found');
-                assert.ok(isChecked(dom, '[data-id="2"] .checkbox-task-done'), 'Task B checked');
-                assert.equal(selectExactlyOne(dom, '[data-id="3"] .label-task-name').textContent, 'Task C', 'Task C found');
-                assert.notOk(isChecked(dom, '[data-id="3"] .checkbox-task-done'), 'Task C not checked');
-                assert.equal(http.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+            var verify = dom => {
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'Task A',
+                    done: false
+                }, {
+                    id: 2,
+                    name: 'Task B',
+                    done: true
+                }, {
+                    id: 3,
+                    name: 'Task C',
+                    done: false
+                }], 'All three sample tasks found');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 done();
-            });
+            };
+            helper.render().then(verify);
         });
 
-        qunit.test("add item", assert => {
+        qunit.test("add item using button", assert => {
             var helper = createHelper();
             helper.addRequestResponsePair(httpGetNoTasks);
             var addUser = () => {
@@ -165,6 +186,169 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                 done();
             };
             helper.render().then(addUser).then(verify);
+        });
+
+        qunit.test("add item enter key", assert => {
+            var helper = createHelper();
+            helper.addRequestResponsePair(httpGetNoTasks);
+            var enterKey = 13;
+            var addUser = () => {
+                helper.userTypesTaskName('Some Task');
+                helper.addRequestResponsePair({
+                    request: {
+                        url: 'database/task-event',
+                        method: 'POST',
+                        body: 'add Some Task'
+                    },
+                    response: {
+                        status: 201,
+                        body: '1 false Some Task'
+                    }
+                });
+                return helper.userPressesKey(enterKey);
+            };
+            assert.expect(2);
+            var done = assert.async();
+            var verify = () => {
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'Some Task',
+                    done: false
+                }], 'Added task');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                done();
+            };
+            helper.render().then(addUser).then(verify);
+        });
+
+        qunit.test("clear done", assert => {
+            var helper = createHelper();
+            var taskDoneAndTaskNotDone = {
+                request: {
+                    url: 'database/task',
+                    method: 'GET'
+                },
+                response: {
+                    status: 200,
+                    body: '1 false This is not done\n2 true This is done'
+                }
+            };
+            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            var clearDone = () => {
+                helper.addRequestResponsePair({
+                    request: {
+                        url: 'database/task-event',
+                        method: 'POST',
+                        body: 'clear'
+                    },
+                    response: {
+                        status: 200
+                    }
+                });
+                helper.addRequestResponsePair({
+                    request: {
+                        url: 'database/task',
+                        method: 'GET'
+                    },
+                    response: {
+                        status: 200,
+                        body: '1 false This is not done'
+                    }
+                });
+                return helper.userPressesClearDoneButton();
+            };
+            assert.expect(2);
+            var done = assert.async();
+            var verify = () => {
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'This is not done',
+                    done: false
+                }], 'Done task cleared');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                done();
+            };
+            helper.render().then(clearDone).then(verify);
+        });
+
+        qunit.test("set done", assert => {
+            var helper = createHelper();
+            var taskDoneAndTaskNotDone = {
+                request: {
+                    url: 'database/task',
+                    method: 'GET'
+                },
+                response: {
+                    status: 200,
+                    body: '1 false This started out not done'
+                }
+            };
+            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            var setDone = () => {
+                helper.addRequestResponsePair({
+                    request: {
+                        url: 'database/task-event',
+                        method: 'POST',
+                        body: 'done 1'
+                    },
+                    response: {
+                        status: 200
+                    }
+                });
+                return helper.userTogglesDoneCheckboxForId(1);
+            };
+            assert.expect(2);
+            var done = assert.async();
+            var verify = () => {
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'This started out not done',
+                    done: true
+                }], 'Done toggled to true');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                done();
+            };
+            helper.render().then(setDone).then(verify);
+        });
+
+        qunit.test("unset done", assert => {
+            var helper = createHelper();
+            var taskDoneAndTaskNotDone = {
+                request: {
+                    url: 'database/task',
+                    method: 'GET'
+                },
+                response: {
+                    status: 200,
+                    body: '1 true This started out done'
+                }
+            };
+            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            var setDone = () => {
+                helper.addRequestResponsePair({
+                    request: {
+                        url: 'database/task-event',
+                        method: 'POST',
+                        body: 'undone 1'
+                    },
+                    response: {
+                        status: 200
+                    }
+                });
+                return helper.userTogglesDoneCheckboxForId(1);
+            };
+            assert.expect(2);
+            var done = assert.async();
+            var verify = () => {
+                assert.deepEqual(helper.tasksDisplayedToUser(), [{
+                    id: 1,
+                    name: 'This started out done',
+                    done: false
+                }], 'Done toggled to false');
+                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                done();
+            };
+            helper.render().then(setDone).then(verify);
         });
     }
 );

@@ -115,7 +115,7 @@ define([], () => {
         var clearButtonClick = () => {
             var request = {method: 'POST', url: 'database/task-event', body: 'clear'};
             userInput.focus();
-            http.sendAsync(request).then(refreshTasks);
+            return http.sendAsync(request).then(refreshTasks);
         };
 
         var render = () => {
@@ -133,7 +133,8 @@ define([], () => {
 
         var contract = {
             render: render,
-            addButtonClick: addButtonClick
+            addButtonClick: addButtonClick,
+            clearButtonClick: clearButtonClick
         };
         return contract;
     };
