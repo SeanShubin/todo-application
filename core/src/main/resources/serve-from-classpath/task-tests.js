@@ -10,7 +10,7 @@
  This ensures that the appearance matches what the customer agreed to
 
  Although it is not complete yet, the sample http requests/responses will eventually come from a separate "specification" project
- This ensures that when the contract between the application and the database changes, there are tests that catch the mismatch
+ This ensures that when the contract between the application and the persistence service changes, there are tests that catch the mismatch
  */
 
 define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],

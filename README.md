@@ -16,6 +16,9 @@
     - Low Coupling
     - High Cohesion
 - Top Down Design
+    - Bottom up design is great for prototyping, so start there if you don't have enough information about something to know how to test drive it
+    - However, once you are actually touching user facing code, do not let the design of the prototype influence the design of the application
+    - All user facing code must be test driven, the prototype is only for learning
 - Agile Design
     - Unplanned design leads to spaghetti code
     - Planned design leads to a bunch of stuff you don't need
