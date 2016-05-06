@@ -24,7 +24,23 @@
     - Planned design leads to a bunch of stuff you don't need
     - Agile design allows the design to evolve as needed
 - Test Driven Design
+    - [types of tests](http://seanshubin.com/types-of-tests.svg)
 - Design by Contract
+- Service Oriented Architecture
+    - The only shared design is at the network specification (in this case, http)
+    - Other than that, application and persistence know nothing about each other
+    - There is no shared code, no binary dependency relationship, and they are never loaded into the same jvm
+    - This frees up both application and persistence to be as simple as they can be on their own
+    - Every logical data store should be behind its own service
+- Layered Architecture
+    - from Domain Driven Design
+        - User Interface
+        - Application
+        - Domain
+        - Infrastructure
+    - todo-application (User Interface and Application)
+    - todo-persistence (Domain and Infrastructure)
+    - todo-specification (communication between Application and Domain)
 - No mocks
     - while I don't have a problem with mocks in principle, you should only reach for them when dummys, stubs, or fakes will not work
     - mocks encourage exercising rather than testing your code
