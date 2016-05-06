@@ -1,3 +1,18 @@
+/*
+ test-driven-008
+ Test drive the javascript as well
+ Since all of the require.js modules expose constructors rather than implementations
+ I have an opportunity to override the collaborators with stubs/fakes/mocks
+ I also rely on a "helper" class to make the tests easier to understand at a high level
+ by delegating low level details to the helper
+
+ Notice that the implementation gets its html from design showcase rather than templates
+ This ensures that the appearance matches what the customer agreed to
+
+ Although it is not complete yet, the sample http requests/responses will eventually come from a separate "specification" project
+ This ensures that when the contract between the application and the database changes, there are tests that catch the mismatch
+ */
+
 define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
     (qunit, createTasks, createHttp, createMarshalling, createNodeUtil, template) => {
         'use strict';

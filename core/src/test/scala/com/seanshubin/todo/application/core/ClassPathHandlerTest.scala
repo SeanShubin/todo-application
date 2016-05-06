@@ -8,6 +8,7 @@ import org.scalatest.FunSuite
 /*
 test-driven-005
 Now that we have the jetty server running, we notice its handler is not implemented
+We only noticed just now because we are doing top down design
 Since we don't have a container, lets add the ability to serve from the class path
 Not having a container makes it easier to get our application behavior under test coverage without overhead
 This forces us to design quite a bit of the domain, such as RequestValue, ResponseValue, and ContentType

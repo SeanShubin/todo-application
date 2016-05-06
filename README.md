@@ -12,7 +12,9 @@
 - With this in mind, I will counter any objection in the form of "but that takes so much effort write!", with something of the form "effort that makes code easier to maintain is worth it"
 
 ## Design Principles
-- Low Coupling, High Cohesion
+- Structured Design
+    - Low Coupling
+    - High Cohesion
 - Top Down Design
 - Agile Design
     - Unplanned design leads to spaghetti code
@@ -32,3 +34,9 @@
         - stub: a limited, deterministic implementation that only emulates and records just enough behavior for a small number of tests
         - fake: a deterministic implementation that simulates a large portion of behavior and is reusable across a large number of tests
 
+## Definitions
+- from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
+    - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
+    - Fake objects actually have working implementations, but usually take some shortcut which makes them not suitable for production (an in memory database is a good example).
+    - Stubs provide canned answers to calls made during the test, usually not responding at all to anything outside what's programmed in for the test. Stubs may also record information about calls, such as an email gateway stub that remembers the messages it 'sent', or maybe only how many messages it 'sent'.
+    - Mocks are what we are talking about here: objects pre-programmed with expectations which form a specification of the calls they are expected to receive.

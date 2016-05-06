@@ -10,8 +10,8 @@ import org.scalatest.FunSuite
 test-driven-007
 Finally we can start writing the html/javascript/css frontend
 But we will soon notice that since we are serving from the class path, we have to rebuild the app each time we make a change.
-This won't do, so lets check the filesystem first, then classpath
- */
+This won't do, so lets check the filesystem first, then the classpath
+*/
 class FileSystemHandlerTest extends FunSuite {
   val charset = StandardCharsets.UTF_8
 
