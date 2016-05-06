@@ -12,6 +12,7 @@
 - With this in mind, I will counter any objection in the form of "but that takes so much effort write!", with something of the form "effort that makes code easier to maintain is worth it"
 
 ## Design Principles
+- Low Coupling, High Cohesion
 - Top Down Design
 - Agile Design
     - Unplanned design leads to spaghetti code
