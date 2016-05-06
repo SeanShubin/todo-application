@@ -188,7 +188,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             helper.render().then(addUser).then(verify);
         });
 
-        qunit.test("add item enter key", assert => {
+        qunit.test("add item using enter key", assert => {
             var helper = createHelper();
             helper.addRequestResponsePair(httpGetNoTasks);
             var enterKey = 13;
