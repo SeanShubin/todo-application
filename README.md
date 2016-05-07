@@ -30,7 +30,7 @@
     - The only shared design is at the network specification (in this case, http)
     - Other than that, application and persistence know nothing about each other
     - There is no shared code, no binary dependency relationship, and they are never loaded into the same jvm
-    - This frees up both application and persistence to be as simple as they can be on their own
+    - This frees up both application and persistence to be as simple as they can be on their own, at the cost of some duplication
     - Every logical data store should be behind its own service
 - Layered Architecture
     - from Domain Driven Design
@@ -52,7 +52,11 @@
         - dummy: a properly typed null that is never invoked, it is only used to get the application to compile
         - stub: a limited, deterministic implementation that only emulates and records just enough behavior for a small number of tests
         - fake: a deterministic implementation that simulates a large portion of behavior and is reusable across a large number of tests
-
+- Given, when, then
+    - no given a, when b, then c, when d, then e
+    - if I need that, I will break it up into two tests
+        - given a, when b, then c
+        - given a b c, when d, then e
 ## Definitions
 - from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
     - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
