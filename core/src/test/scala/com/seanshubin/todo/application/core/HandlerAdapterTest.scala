@@ -21,7 +21,7 @@ class HandlerAdapterTest extends FunSuite {
   test("do nothing if no response") {
     //given
     val maybeResponseValue = None
-    val valueHandler = new StubValueHandler(maybeResponseValue)
+    val valueHandler = new StubRequestValueHandler(maybeResponseValue)
     val handlerAdapter = new HandlerAdapter(valueHandler)
     val target = "target"
     val channel: HttpChannel = null
@@ -41,7 +41,7 @@ class HandlerAdapterTest extends FunSuite {
     val charset = StandardCharsets.UTF_8
     val helloBytes = "hello".getBytes(charset)
     val maybeResponseValue = Some(ContentResponse(200, ContentType("text/plain", Some(charset)), helloBytes))
-    val valueHandler = new StubValueHandler(maybeResponseValue)
+    val valueHandler = new StubRequestValueHandler(maybeResponseValue)
     val handlerAdapter = new HandlerAdapter(valueHandler)
     val target = "target"
     val channel: HttpChannel = null
@@ -59,7 +59,7 @@ class HandlerAdapterTest extends FunSuite {
     assert(response.stubOutputStream.asText(charset) === "hello")
   }
 
-  class StubValueHandler(maybeResponseValue: Option[ResponseValue]) extends ValueHandler {
+  class StubRequestValueHandler(maybeResponseValue: Option[ResponseValue]) extends RequestValueHandler {
     override def handle(request: RequestValue): Option[ResponseValue] = maybeResponseValue
   }
 

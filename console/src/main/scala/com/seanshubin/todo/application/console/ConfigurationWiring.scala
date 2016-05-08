@@ -26,10 +26,10 @@ trait ConfigurationWiring {
   lazy val classLoader: ClassLoader = getClass.getClassLoader
   lazy val classLoaderContract: ClassLoaderContract = new ClassLoaderDelegate(classLoader)
   lazy val files: FilesContract = FilesDelegate
-  lazy val redirectHandler: ValueHandler = new RedirectHandler(redirects)
-  lazy val fileSystemHandler: ValueHandler = new FileSystemHandler(serveFromDirectory, files, contentTypeByExtension)
-  lazy val classPathHandler: ValueHandler = new ClassPathHandler(serveFromClasspathPrefix, classLoaderContract, contentTypeByExtension)
-  lazy val compositeHandler: ValueHandler = new CompositeHandler(redirectHandler, fileSystemHandler, classPathHandler)
+  lazy val redirectHandler: RequestValueHandler = new RedirectHandlerRequest(redirects)
+  lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandlerRequest(serveFromDirectory, files, contentTypeByExtension)
+  lazy val classPathHandler: RequestValueHandler = new ClassPathHandlerRequest(serveFromClasspathPrefix, classLoaderContract, contentTypeByExtension)
+  lazy val compositeHandler: RequestValueHandler = new CompositeHandlerRequest(redirectHandler, fileSystemHandler, classPathHandler)
   lazy val handler: Handler = new HandlerAdapter(compositeHandler)
   lazy val runner: Runnable = new JettyRunner(JettyServerDelegate.create, handler, configuration.port)
 }

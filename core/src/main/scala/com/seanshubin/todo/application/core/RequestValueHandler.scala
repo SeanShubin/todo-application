@@ -1,5 +1,5 @@
 package com.seanshubin.todo.application.core
 
-trait ValueHandler {
+trait RequestValueHandler {
   def handle(request: RequestValue): Option[ResponseValue]
 }

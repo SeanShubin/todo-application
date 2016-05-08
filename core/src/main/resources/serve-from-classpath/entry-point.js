@@ -1,6 +1,6 @@
 define([
         'tasks',
-        'fake-http',
+        'http',
         'marshalling',
         'node-util',
         'text!todo-list-style-showcase.html'],
@@ -10,18 +10,6 @@ define([
               createNodeUtil,
               template) {
         var http = createHttp();
-        http.addRequestResponsePair(
-            {
-                request: {
-                    url: 'database/task',
-                    method: 'GET'
-                },
-                response: {
-                    status: 200,
-                    body: '1 false Task A\n2 true Task B\n3 false Task C'
-                }
-            }
-        );
         var tasks = createTasks({
             http: http,
             marshalling: createMarshalling(),

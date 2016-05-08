@@ -27,5 +27,4 @@ object IoUtil {
     }
     loop(inputStream.read())
   }
-
 }

@@ -5,7 +5,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 
-class HandlerAdapter(delegate: ValueHandler) extends AbstractHandler {
+class HandlerAdapter(delegate: RequestValueHandler) extends AbstractHandler {
   override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val requestValue = RequestValue(request.getPathInfo)
     val maybeResponseValue = delegate.handle(requestValue)

@@ -6,7 +6,7 @@ class RedirectHandlerTest extends FunSuite {
   test("redirect found") {
     //given
     val redirects = Map("/foo" -> "/bar")
-    val redirectHandler = new RedirectHandler(redirects)
+    val redirectHandler = new RedirectHandlerRequest(redirects)
     val request = RequestValue("/foo")
     //when
     val Some(response) = redirectHandler.handle(request)
@@ -19,7 +19,7 @@ class RedirectHandlerTest extends FunSuite {
   test("redirect not found") {
     //given
     val redirects = Map("/foo" -> "/bar")
-    val redirectHandler = new RedirectHandler(redirects)
+    val redirectHandler = new RedirectHandlerRequest(redirects)
     val request = RequestValue("/baz")
     //when
     val maybeResponse = redirectHandler.handle(request)

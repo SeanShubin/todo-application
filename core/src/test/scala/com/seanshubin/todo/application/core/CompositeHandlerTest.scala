@@ -6,9 +6,9 @@ import org.scalatest.FunSuite
 class CompositeHandlerTest extends FunSuite {
   test("both handlers none, returns none") {
     //given
-    val handlerA = new StubHandler(None)
-    val handlerB = new StubHandler(None)
-    val compositeHandler = new CompositeHandler(handlerA, handlerB)
+    val handlerA = new StubHandlerRequest(None)
+    val handlerB = new StubHandlerRequest(None)
+    val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
     val dummyRequest: RequestValue = null
     //when
     val maybeResponse = compositeHandler.handle(dummyRequest)
@@ -20,9 +20,9 @@ class CompositeHandlerTest extends FunSuite {
     //given
     val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
     val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
-    val handlerA = new StubHandler(Some(responseA))
-    val handlerB = new StubHandler(Some(responseB))
-    val compositeHandler = new CompositeHandler(handlerA, handlerB)
+    val handlerA = new StubHandlerRequest(Some(responseA))
+    val handlerB = new StubHandlerRequest(Some(responseB))
+    val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
     val dummyRequest: RequestValue = null
     //when
     val maybeResponse = compositeHandler.handle(dummyRequest)
@@ -33,9 +33,9 @@ class CompositeHandlerTest extends FunSuite {
   test("only first handler set") {
     //given
     val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
-    val handlerA = new StubHandler(Some(responseA))
-    val handlerB = new StubHandler(None)
-    val compositeHandler = new CompositeHandler(handlerA, handlerB)
+    val handlerA = new StubHandlerRequest(Some(responseA))
+    val handlerB = new StubHandlerRequest(None)
+    val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
     val dummyRequest: RequestValue = null
     //when
     val maybeResponse = compositeHandler.handle(dummyRequest)
@@ -46,9 +46,9 @@ class CompositeHandlerTest extends FunSuite {
   test("only second handler set") {
     //given
     val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
-    val handlerA = new StubHandler(None)
-    val handlerB = new StubHandler(Some(responseB))
-    val compositeHandler = new CompositeHandler(handlerA, handlerB)
+    val handlerA = new StubHandlerRequest(None)
+    val handlerB = new StubHandlerRequest(Some(responseB))
+    val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
     val dummyRequest: RequestValue = null
     //when
     val maybeResponse = compositeHandler.handle(dummyRequest)
@@ -56,7 +56,7 @@ class CompositeHandlerTest extends FunSuite {
     assert(maybeResponse === Some(responseB))
   }
 
-  class StubHandler(maybeResponse: Option[ResponseValue]) extends ValueHandler {
+  class StubHandlerRequest(maybeResponse: Option[ResponseValue]) extends RequestValueHandler {
     override def handle(request: RequestValue): Option[ResponseValue] = maybeResponse
   }
 

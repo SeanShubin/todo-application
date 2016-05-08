@@ -1,6 +1,6 @@
 package com.seanshubin.todo.application.core
 
-abstract class NamedBytesHandler(contentTypeByExtension: Map[String, ContentType]) extends ValueHandler {
+abstract class NamedBytesHandlerRequest(contentTypeByExtension: Map[String, ContentType]) extends RequestValueHandler {
   def pathToBytes(path: String): Option[Seq[Byte]]
 
   override final def handle(request: RequestValue): Option[ResponseValue] = {
