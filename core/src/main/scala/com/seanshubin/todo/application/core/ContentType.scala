@@ -26,4 +26,21 @@ object ContentType {
         throw new RuntimeException(s"Value '$value' does not match pattern '$ContentTypeRegex' for content type")
     }
   }
+
+  def fromHeaders(headers: Seq[(String, String)]): ContentType = {
+    val contentTypeHeaders = headers.filter(isContentTypeHeader)
+    if (contentTypeHeaders.isEmpty) {
+      throw new RuntimeException("Content-Type header not found")
+    } else if (contentTypeHeaders.size > 1) {
+      throw new RuntimeException("More than one Content-Type header found")
+    } else {
+      val (_, value) = contentTypeHeaders.head
+      fromString(value)
+    }
+  }
+
+  def isContentTypeHeader(entry: (String, String)): Boolean = {
+    val (key, _) = entry
+    key.equalsIgnoreCase("Content-Type")
+  }
 }

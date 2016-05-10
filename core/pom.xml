@@ -28,6 +28,10 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+        </dependency>
     </dependencies>
     <parent>
         <groupId>com.seanshubin.todo.application</groupId>
