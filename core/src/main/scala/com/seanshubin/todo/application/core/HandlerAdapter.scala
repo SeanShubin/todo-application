@@ -7,7 +7,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler
 
 class HandlerAdapter(delegate: RequestValueHandler) extends AbstractHandler {
   override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
-    val requestValue = RequestValue(request.getPathInfo)
+    val emptyBody = Seq[Byte]()
+    val requestValue = RequestValue(request.getPathInfo, emptyBody)
     val maybeResponseValue = delegate.handle(requestValue)
     maybeResponseValue match {
       case Some(responseValue) =>

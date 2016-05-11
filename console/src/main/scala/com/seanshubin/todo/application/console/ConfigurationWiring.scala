@@ -29,9 +29,9 @@ trait ConfigurationWiring {
   lazy val redirectHandler: RequestValueHandler = new RedirectHandlerRequest(redirects)
   lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandlerRequest(serveFromDirectory, files, contentTypeByExtension)
   lazy val classPathHandler: RequestValueHandler = new ClassPathHandlerRequest(serveFromClasspathPrefix, classLoaderContract, contentTypeByExtension)
-  lazy val httpClient: HttpClient = ???
-  lazy val forwardingHandler: RequestValueHandler = new ForwardingHandler("database", configuration.databaseApiHost, configuration.databaseApiPort, httpClient)
-  lazy val compositeHandler: RequestValueHandler = new CompositeHandlerRequest(redirectHandler, fileSystemHandler, classPathHandler)
+  lazy val httpClient: HttpClient = new GoogleHttpClient
+  lazy val forwardingHandler: RequestValueHandler = new ForwardingHandler("/database", configuration.databaseApiHost, configuration.databaseApiPort, httpClient)
+  lazy val compositeHandler: RequestValueHandler = new CompositeHandlerRequest(redirectHandler, forwardingHandler, fileSystemHandler, classPathHandler)
   lazy val handler: Handler = new HandlerAdapter(compositeHandler)
   lazy val runner: Runnable = new JettyRunner(JettyServerDelegate.create, handler, configuration.port)
 }
