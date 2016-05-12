@@ -9,33 +9,33 @@ case class Headers(entries: Seq[(String, String)]) {
     appendOrUpdateEntry("Content-Type", s"$mimeType; charset=$charset")
   }
 
-  def appendOrUpdateEntry(key: String, value: String): Headers = {
-    val index = entries.indexWhere(entry => key.equalsIgnoreCase(entry._1))
+  def appendOrUpdateEntry(name: String, value: String): Headers = {
+    val index = entries.indexWhere(entry => name.equalsIgnoreCase(entry._1))
     if (index == -1) {
-      appendEntry(key, value)
+      appendEntry(name, value)
     } else {
-      updateEntry(index, key, value)
+      updateEntry(index, name, value)
     }
   }
 
-  def appendEntry(key: String, value: String): Headers = {
-    Headers(entries :+(key, value))
+  def appendEntry(name: String, value: String): Headers = {
+    Headers(entries :+(name, value))
   }
 
-  def updateEntry(index: Int, key: String, value: String): Headers = {
-    Headers(entries.take(index) ++ Seq((key, value)) ++ entries.drop(index))
+  def updateEntry(index: Int, name: String, value: String): Headers = {
+    Headers(entries.take(index) ++ Seq((name, value)) ++ entries.drop(index))
   }
 
   def validate(): Unit = {
-    val keys = entries.map(_._1).map(_.toLowerCase)
-    validate(keys.toList)
+    val names = entries.map(_._1).map(_.toLowerCase)
+    validate(names.toList)
   }
 
-  def validate(keys: List[String]): Unit = {
-    if (keys.nonEmpty) {
-      val head :: tail = keys
+  def validate(names: List[String]): Unit = {
+    if (names.nonEmpty) {
+      val head :: tail = names
       if (tail.contains(head)) {
-        throw new RuntimeException(s"Duplicate key '$head'")
+        throw new RuntimeException(s"Duplicate header name '$head'")
       }
     }
   }

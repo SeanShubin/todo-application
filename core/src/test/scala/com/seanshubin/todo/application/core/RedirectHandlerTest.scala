@@ -11,7 +11,7 @@ class RedirectHandlerTest extends FunSuite {
     //when
     val Some(response) = redirectHandler.handle(request)
     //then
-    assert(response.headers === Seq("Location" -> "/bar"))
+    assert(response.headers.entries === Seq("Location" -> "/bar"))
     assert(response.bytes === Seq())
     assert(response.statusCode === 301)
   }
