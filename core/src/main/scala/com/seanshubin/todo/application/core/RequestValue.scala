@@ -1,6 +1,8 @@
 package com.seanshubin.todo.application.core
 
 case class RequestValue(uri: UriValue, method: String, headers: Headers, body: Seq[Byte]) {
+  def updatePath(path: String): RequestValue = copy(uri = uri.copy(path = path))
+
   def updateHost(host: String): RequestValue = copy(uri = uri.copy(host = host))
 
   def updatePort(port: Int): RequestValue = copy(uri = uri.copy(port = port))

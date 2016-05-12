@@ -9,12 +9,18 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import scala.collection.JavaConverters._
 
 class GoogleHttpClient extends HttpClient {
+  val httpTransport: HttpTransport = new NetHttpTransport()
+  val factory: HttpRequestFactory = httpTransport.createRequestFactory()
+  val buildRequestMap: Map[String, (GenericUrl, Array[Byte]) => HttpRequest] = Map(
+    "GET" -> buildGet,
+    "POST" -> buildPost
+  )
+
   def send(request: RequestValue): ResponseValue = {
     try {
-      val httpTransport: HttpTransport = new NetHttpTransport()
-      val factory: HttpRequestFactory = httpTransport.createRequestFactory()
       val genericUrl = new GenericUrl(request.uri.toString)
-      val googleRequest = factory.buildGetRequest(genericUrl)
+      val bytes = request.body.toArray
+      val googleRequest = buildRequestMap(request.method)(genericUrl, bytes)
       val response = googleRequest.execute()
       val responseHeaders = extractHeaders(response)
       val responseBytes = extractBody(response)
@@ -26,20 +32,13 @@ class GoogleHttpClient extends HttpClient {
     }
   }
 
-  def extractContentType(headers: Seq[(String, String)]): String = {
-    def keyMatchesContentType(entry: (String, String)): Boolean = {
-      val (key, _) = entry
-      "Content-Type".equalsIgnoreCase(key)
-    }
-    val contentTypeHeaders = headers.filter(keyMatchesContentType)
-    if (contentTypeHeaders.isEmpty) {
-      throw new RuntimeException("No content type in headers")
-    } else if (contentTypeHeaders.size > 1) {
-      throw new RuntimeException("More than one content type specified")
-    } else {
-      val (_, contentType) = contentTypeHeaders.head
-      contentType
-    }
+  def buildGet(url: GenericUrl, bytes: Array[Byte]): HttpRequest = {
+    factory.buildGetRequest(url)
+  }
+
+  def buildPost(url: GenericUrl, bytes: Array[Byte]): HttpRequest = {
+    val content = new ByteArrayContent(null, bytes)
+    factory.buildPostRequest(url, content)
   }
 
   def extractHeaders(response: HttpResponse): Headers = {
