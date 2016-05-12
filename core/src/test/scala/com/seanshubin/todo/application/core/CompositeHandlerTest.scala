@@ -1,6 +1,7 @@
 package com.seanshubin.todo.application.core
 
-import com.seanshubin.todo.application.core.ResponseValue.ContentResponse
+import java.nio.charset.StandardCharsets
+
 import org.scalatest.FunSuite
 
 class CompositeHandlerTest extends FunSuite {
@@ -18,8 +19,8 @@ class CompositeHandlerTest extends FunSuite {
 
   test("both handlers set, return first") {
     //given
-    val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
-    val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
+    val responseA = textResponse("response a")
+    val responseB = textResponse("response b")
     val handlerA = new StubHandlerRequest(Some(responseA))
     val handlerB = new StubHandlerRequest(Some(responseB))
     val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
@@ -32,7 +33,7 @@ class CompositeHandlerTest extends FunSuite {
 
   test("only first handler set") {
     //given
-    val responseA = ContentResponse(200, ContentType("response a", maybeCharset = None), Seq())
+    val responseA = textResponse("response a")
     val handlerA = new StubHandlerRequest(Some(responseA))
     val handlerB = new StubHandlerRequest(None)
     val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
@@ -45,7 +46,7 @@ class CompositeHandlerTest extends FunSuite {
 
   test("only second handler set") {
     //given
-    val responseB = ContentResponse(200, ContentType("response b", maybeCharset = None), Seq())
+    val responseB = textResponse("response b")
     val handlerA = new StubHandlerRequest(None)
     val handlerB = new StubHandlerRequest(Some(responseB))
     val compositeHandler = new CompositeHandlerRequest(handlerA, handlerB)
@@ -60,4 +61,5 @@ class CompositeHandlerTest extends FunSuite {
     override def handle(request: RequestValue): Option[ResponseValue] = maybeResponse
   }
 
+  def textResponse(text: String) = ResponseValue.plainText(200, Headers.Empty, text, StandardCharsets.UTF_8)
 }

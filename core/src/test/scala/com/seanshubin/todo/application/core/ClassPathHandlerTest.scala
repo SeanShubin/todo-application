@@ -20,16 +20,14 @@ If it turns out to be the case that some things are easier to test at the detail
  */
 class ClassPathHandlerTest extends FunSuite {
   val charset = StandardCharsets.UTF_8
-  val contentTypeByExtension = Map(
-    ".txt" -> ContentType("text/plain", Some(charset))
-  )
+  val mimeTypeByExtension = Map(".txt" -> "text/plain")
 
   test("load from class path") {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, contentTypeByExtension)
-    val request = RequestValue("/hello.txt")
+    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val request = RequestValue.path("/hello.txt")
     //when
     val Some(response) = classPathHandler.handle(request)
     //then
@@ -41,8 +39,8 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, contentTypeByExtension)
-    val request = RequestValue("/does-not-exist.txt")
+    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val request = RequestValue.path("/does-not-exist.txt")
     //when
     val maybeResponse = classPathHandler.handle(request)
     //then
@@ -53,8 +51,8 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, contentTypeByExtension)
-    val request = RequestValue("/unusual-extension.xhtml")
+    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val request = RequestValue.path("/unusual-extension.xhtml")
     //when
     val exception = intercept[RuntimeException] {
       classPathHandler.handle(request)
@@ -67,8 +65,8 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, contentTypeByExtension)
-    val request = RequestValue("/hello")
+    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val request = RequestValue.path("/hello")
     //when
     val exception = intercept[RuntimeException] {
       classPathHandler.handle(request)

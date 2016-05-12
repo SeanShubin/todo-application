@@ -3,7 +3,6 @@ package com.seanshubin.todo.application.core
 import java.nio.charset.{Charset, StandardCharsets}
 import javax.servlet.{ServletOutputStream, WriteListener}
 
-import com.seanshubin.todo.application.core.ResponseValue.ContentResponse
 import org.eclipse.jetty.server.{HttpChannel, HttpInput, Request}
 import org.scalatest.FunSuite
 
@@ -39,8 +38,8 @@ class HandlerAdapterTest extends FunSuite {
   test("forward resposne") {
     //given
     val charset = StandardCharsets.UTF_8
-    val helloBytes = "hello".getBytes(charset)
-    val maybeResponseValue = Some(ContentResponse(200, ContentType("text/plain", Some(charset)), helloBytes))
+    val text = "hello"
+    val maybeResponseValue = Some(ResponseValue.plainText(200, Headers.Empty.setContentType("text/plain", charset), text, charset))
     val valueHandler = new StubRequestValueHandler(maybeResponseValue)
     val handlerAdapter = new HandlerAdapter(valueHandler)
     val target = "target"

@@ -1,21 +1,24 @@
 package com.seanshubin.todo.application.core
 
-abstract class NamedBytesHandlerRequest(contentTypeByExtension: Map[String, ContentType]) extends RequestValueHandler {
+import java.nio.charset.Charset
+
+abstract class NamedBytesHandlerRequest(mimeTypeByExtension: Map[String, String], charset: Charset) extends RequestValueHandler {
   def pathToBytes(path: String): Option[Seq[Byte]]
 
   override final def handle(request: RequestValue): Option[ResponseValue] = {
-    val resourceName = request.path
+    val resourceName = request.uri.path
     val maybeExtension = getExtension(resourceName)
     maybeExtension match {
       case Some(extension) =>
-        val maybeContentType = contentTypeByExtension.get(extension)
+        val maybeContentType = mimeTypeByExtension.get(extension)
         maybeContentType match {
           case Some(contentType) =>
             val maybeBytes = pathToBytes(resourceName)
+            val headers = Headers.Empty.setContentType(contentType, charset)
             maybeBytes.map {
               bytes =>
                 val statusCode = 200
-                val response = ResponseValue.ContentResponse(statusCode, contentType, bytes)
+                val response = ResponseValue(statusCode, headers, bytes)
                 response
             }
           case None =>

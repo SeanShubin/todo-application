@@ -18,7 +18,7 @@ class FileSystemHandlerTest extends FunSuite {
   test("load from file system") {
     //given
     val fileSystemHandler = createFileSystemHandler(Some(FilePathAndContent(Paths.get("/hello.txt"), "Hello, world!")))
-    val request = RequestValue("/hello.txt")
+    val request = RequestValue.path("/hello.txt")
     //when
     val Some(response) = fileSystemHandler.handle(request)
     //then
@@ -30,7 +30,7 @@ class FileSystemHandlerTest extends FunSuite {
   test("not found in file system") {
     //given
     val fileSystemHandler = createFileSystemHandler(None)
-    val request = RequestValue("/does-not-exist.txt")
+    val request = RequestValue.path("/does-not-exist.txt")
     //when
     val maybeResponse = fileSystemHandler.handle(request)
     //then
@@ -40,7 +40,7 @@ class FileSystemHandlerTest extends FunSuite {
   test("content type not registered for extension") {
     //given
     val fileSystemHandler = createFileSystemHandler(Some(FilePathAndContent(Paths.get("/unusual-extension.xhtml"), "hello")))
-    val request = RequestValue("/unusual-extension.xhtml")
+    val request = RequestValue.path("/unusual-extension.xhtml")
     //when
     val exception = intercept[RuntimeException] {
       fileSystemHandler.handle(request)
@@ -52,7 +52,7 @@ class FileSystemHandlerTest extends FunSuite {
   test("no extension") {
     //given
     val fileSystemHandler = createFileSystemHandler(Some(FilePathAndContent(Paths.get("/hello"), "hello")))
-    val request = RequestValue("/hello")
+    val request = RequestValue.path("/hello")
     //when
     val exception = intercept[RuntimeException] {
       fileSystemHandler.handle(request)
@@ -64,10 +64,8 @@ class FileSystemHandlerTest extends FunSuite {
   def createFileSystemHandler(maybeFile: Option[FilePathAndContent]): FileSystemHandlerRequest = {
     val directory = Paths.get("resources/serve-from-classpath")
     val filesContract = new StubFiles(maybeFile)
-    val contentTypeByExtension = Map(
-      ".txt" -> ContentType("text/plain", Some(charset))
-    )
-    new FileSystemHandlerRequest(directory, filesContract, contentTypeByExtension)
+    val mimeTypeByExtension = Map(".txt" -> "text/plain")
+    new FileSystemHandlerRequest(directory, filesContract, mimeTypeByExtension, charset)
   }
 
   class StubFiles(maybeFile: Option[FilePathAndContent]) extends FilesNotImplemented {

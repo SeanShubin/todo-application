@@ -8,17 +8,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler
 class HandlerAdapter(delegate: RequestValueHandler) extends AbstractHandler {
   override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val emptyBody = Seq[Byte]()
-    val requestValue = RequestValue(request.getPathInfo, emptyBody)
+    val requestValue = HttpServletTransformer.readRequestValue(request)
     val maybeResponseValue = delegate.handle(requestValue)
     maybeResponseValue match {
       case Some(responseValue) =>
-        for {
-          (name, value) <- responseValue.headers
-        } {
-          response.addHeader(name, value)
-        }
-        response.setStatus(responseValue.statusCode)
-        IoUtil.bytesToOutputStream(responseValue.bytes, response.getOutputStream)
+        HttpServletTransformer.writeResponseValue(responseValue, response)
         baseRequest.setHandled(true)
       case None =>
       //do nothing

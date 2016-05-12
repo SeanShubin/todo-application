@@ -1,25 +1,17 @@
 package com.seanshubin.todo.application.core
 
-sealed trait ResponseValue {
-  def headers: Seq[(String, String)]
+import java.nio.charset.Charset
 
-  def statusCode: Int
-
-  def bytes: Seq[Byte]
-}
+case class ResponseValue(statusCode: Int, headers: Headers, bytes: Seq[Byte])
 
 object ResponseValue {
-
-  case class ContentResponse(statusCode: Int, contentType: ContentType, bytes: Seq[Byte]) extends ResponseValue {
-    override def headers(): Seq[(String, String)] = Seq("Content-Type" -> contentType.toString)
+  def plainText(statusCode: Int, headers: Headers, text: String, charset: Charset): ResponseValue = {
+    val bytes = text.getBytes(charset)
+    val headersWithContentType = headers.setContentType("text/plain", charset)
+    ResponseValue(statusCode, headersWithContentType, bytes)
   }
 
-  case class RedirectResponse(newPath: String) extends ResponseValue {
-    override def headers: Seq[(String, String)] = Seq("Location" -> newPath)
-
-    override def statusCode: Int = 301
-
-    override def bytes: Seq[Byte] = Seq()
+  def redirect(newPath: String): ResponseValue = {
+    ResponseValue(301, Headers.Empty.appendEntry("Location", newPath), Seq())
   }
-
 }

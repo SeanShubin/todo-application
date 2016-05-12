@@ -13,12 +13,12 @@ trait ConfigurationWiring {
   lazy val serveFromClasspathPrefix: String = "serve-from-classpath"
   lazy val serveFromDirectory: Path = configuration.serveFromDirectory
   lazy val charset: Charset = StandardCharsets.UTF_8
-  lazy val contentTypeByExtension: Map[String, ContentType] = Map(
-    ".js" -> ContentType("text/javascript", Some(charset)),
-    ".css" -> ContentType("text/css", Some(charset)),
-    ".txt" -> ContentType("text/plain", Some(charset)),
-    ".html" -> ContentType("text/html", Some(charset)),
-    ".ico" -> ContentType("image/x-icon", None)
+  lazy val mimeTypeByExtension: Map[String, String] = Map(
+    ".js" -> "text/javascript",
+    ".css" -> "text/css",
+    ".txt" -> "text/plain",
+    ".html" -> "text/html",
+    ".ico" -> "image/x-icon"
   )
   lazy val redirects: Map[String, String] = Map(
     "/" -> "/index.html"
@@ -27,8 +27,8 @@ trait ConfigurationWiring {
   lazy val classLoaderContract: ClassLoaderContract = new ClassLoaderDelegate(classLoader)
   lazy val files: FilesContract = FilesDelegate
   lazy val redirectHandler: RequestValueHandler = new RedirectHandlerRequest(redirects)
-  lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandlerRequest(serveFromDirectory, files, contentTypeByExtension)
-  lazy val classPathHandler: RequestValueHandler = new ClassPathHandlerRequest(serveFromClasspathPrefix, classLoaderContract, contentTypeByExtension)
+  lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandlerRequest(serveFromDirectory, files, mimeTypeByExtension, charset)
+  lazy val classPathHandler: RequestValueHandler = new ClassPathHandlerRequest(serveFromClasspathPrefix, classLoaderContract, mimeTypeByExtension, charset)
   lazy val httpClient: HttpClient = new GoogleHttpClient
   lazy val forwardingHandler: RequestValueHandler = new ForwardingHandler("/database", configuration.databaseApiHost, configuration.databaseApiPort, httpClient)
   lazy val compositeHandler: RequestValueHandler = new CompositeHandlerRequest(redirectHandler, forwardingHandler, fileSystemHandler, classPathHandler)
