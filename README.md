@@ -1,4 +1,5 @@
 # Todo Application sample for Scala training
+- It is more important for code to be easy to maintain perpetually, than it is to be easy to write initially
 
 ## Differing opinions
 - You may not agree with all of my design principles, and that is fine
@@ -41,6 +42,10 @@
     - todo-application (User Interface and Application)
     - todo-persistence (Domain and Infrastructure)
     - todo-specification (communication between Application and Domain)
+- Lambda Architecture
+    - at the persistence level
+        - no updates
+        - no deletes
 - No mocks
     - while I don't have a problem with mocks in principle, you should only reach for them when dummys, stubs, or fakes will not work
     - mocks encourage exercising rather than testing your code
