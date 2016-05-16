@@ -16,7 +16,7 @@
         </dependency>
     </dependencies>
     <parent>
-        <groupId>com.seanshubin.todo.application</groupId>
+        <groupId>com.seanshubin.todo</groupId>
         <artifactId>todo-application</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>

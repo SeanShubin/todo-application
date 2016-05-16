@@ -9,13 +9,13 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>com.seanshubin.todo.application</groupId>
+            <groupId>com.seanshubin.todo</groupId>
             <artifactId>todo-application-core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
     <parent>
-        <groupId>com.seanshubin.todo.application</groupId>
+        <groupId>com.seanshubin.todo</groupId>
         <artifactId>todo-application</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
