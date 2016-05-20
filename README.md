@@ -1,12 +1,12 @@
-# Todo Application sample for Scala training
-- It is more important for code to be easy to maintain perpetually, than it is to be easy to write initially
+Application layer for Scala training sample project
+===================================================
 
 ## Differing opinions
 - You may not agree with all of my design principles, and that is fine
 - I am teaching one possible way to write maintainable code
 - The important thing is that you understand why I have applied these design principles, so you can make an informed decision as to when to deviate from these principles
-- Keep in mind that I have promised to show you how to write code that is easy to maintain, not easy to write
-- Code is initially written once, by one person, but maintained perpetually, by multiple people
+- Keep in mind that I am demonstrating how to write code that is easy to maintain, not easy to write
+- Code is initially written once, by few, but maintained perpetually, by many
 - So it is not unreasonable to trade some extra effort up front for ease of maintenance later
 - Before objecting to any practice that seems like extra work up front, think about maintainability
 - It takes a great deal of discipline and effort to write maintainable code, but it is not complicated once you know what to do
