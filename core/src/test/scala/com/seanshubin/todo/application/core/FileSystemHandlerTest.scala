@@ -61,11 +61,11 @@ class FileSystemHandlerTest extends FunSuite {
     assert(exception.getMessage === "Unable to find extension for /hello (needed to compute content type)")
   }
 
-  def createFileSystemHandler(maybeFile: Option[FilePathAndContent]): FileSystemHandlerRequest = {
+  def createFileSystemHandler(maybeFile: Option[FilePathAndContent]): FileSystemHandler = {
     val directory = Paths.get("resources/serve-from-classpath")
     val filesContract = new StubFiles(maybeFile)
     val mimeTypeByExtension = Map(".txt" -> "text/plain")
-    new FileSystemHandlerRequest(directory, filesContract, mimeTypeByExtension, charset)
+    new FileSystemHandler(directory, filesContract, mimeTypeByExtension, charset)
   }
 
   class StubFiles(maybeFile: Option[FilePathAndContent]) extends FilesNotImplemented {

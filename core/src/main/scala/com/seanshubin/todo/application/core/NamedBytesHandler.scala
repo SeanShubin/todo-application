@@ -2,7 +2,7 @@ package com.seanshubin.todo.application.core
 
 import java.nio.charset.Charset
 
-abstract class NamedBytesHandlerRequest(mimeTypeByExtension: Map[String, String], charset: Charset) extends RequestValueHandler {
+abstract class NamedBytesHandler(mimeTypeByExtension: Map[String, String], charset: Charset) extends RequestValueHandler {
   def pathToBytes(path: String): Option[Seq[Byte]]
 
   override final def handle(request: RequestValue): Option[ResponseValue] = {

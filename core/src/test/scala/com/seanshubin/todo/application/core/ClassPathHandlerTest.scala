@@ -26,7 +26,7 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val classPathHandler = new ClassPathHandler(prefix, classLoader, mimeTypeByExtension, charset)
     val request = RequestValue.path("/hello.txt")
     //when
     val Some(response) = classPathHandler.handle(request)
@@ -39,7 +39,7 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val classPathHandler = new ClassPathHandler(prefix, classLoader, mimeTypeByExtension, charset)
     val request = RequestValue.path("/does-not-exist.txt")
     //when
     val maybeResponse = classPathHandler.handle(request)
@@ -51,7 +51,7 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val classPathHandler = new ClassPathHandler(prefix, classLoader, mimeTypeByExtension, charset)
     val request = RequestValue.path("/unusual-extension.xhtml")
     //when
     val exception = intercept[RuntimeException] {
@@ -65,7 +65,7 @@ class ClassPathHandlerTest extends FunSuite {
     //given
     val prefix = "serve-from-classpath"
     val classLoader = new ClassLoaderDelegate(getClass.getClassLoader)
-    val classPathHandler = new ClassPathHandlerRequest(prefix, classLoader, mimeTypeByExtension, charset)
+    val classPathHandler = new ClassPathHandler(prefix, classLoader, mimeTypeByExtension, charset)
     val request = RequestValue.path("/hello")
     //when
     val exception = intercept[RuntimeException] {

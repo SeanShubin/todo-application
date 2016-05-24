@@ -27,8 +27,8 @@ trait ConfigurationWiring {
   lazy val classLoaderContract: ClassLoaderContract = new ClassLoaderDelegate(classLoader)
   lazy val files: FilesContract = FilesDelegate
   lazy val redirectHandler: RequestValueHandler = new RedirectHandlerRequest(redirects)
-  lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandlerRequest(serveFromDirectory, files, mimeTypeByExtension, charset)
-  lazy val classPathHandler: RequestValueHandler = new ClassPathHandlerRequest(serveFromClasspathPrefix, classLoaderContract, mimeTypeByExtension, charset)
+  lazy val fileSystemHandler: RequestValueHandler = new FileSystemHandler(serveFromDirectory, files, mimeTypeByExtension, charset)
+  lazy val classPathHandler: RequestValueHandler = new ClassPathHandler(serveFromClasspathPrefix, classLoaderContract, mimeTypeByExtension, charset)
   lazy val httpClient: HttpClient = new GoogleHttpClient
   lazy val forwardingHandler: RequestValueHandler = new ForwardingHandler("/database", configuration.databaseApiHost, configuration.databaseApiPort, httpClient)
   lazy val compositeHandler: RequestValueHandler = new CompositeHandlerRequest(redirectHandler, forwardingHandler, fileSystemHandler, classPathHandler)

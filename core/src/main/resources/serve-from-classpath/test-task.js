@@ -16,6 +16,8 @@
 define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
     (qunit, createTasks, createHttp, createMarshalling, createNodeUtil, template) => {
         'use strict';
+        qunit.module('task');
+
         var marshalling = createMarshalling();
         var httpGetNoTasks = {
             request: {
