@@ -1,9 +1,10 @@
-define(function () {
-    var constructor = function () {
-        var sendAsync = function (options) {
-            return new Promise(function (resolve) {
+define(() => {
+    'use strict';
+    var constructor = () => {
+        var sendAsync = options => {
+            return new Promise(resolve => {
                 var client = new XMLHttpRequest();
-                var executePromise = function () {
+                var executePromise = () => {
                     if (client.readyState === XMLHttpRequest.DONE) {
                         var response = {status: client.status, body: client.responseText};
                         resolve(response);

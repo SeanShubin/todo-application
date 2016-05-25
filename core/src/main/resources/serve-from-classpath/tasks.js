@@ -1,4 +1,5 @@
 define([], () => {
+    'use strict';
     var constructor = collaborators => {
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
@@ -11,7 +12,7 @@ define([], () => {
             var lines = marshalling.stringToLines(response.body);
             var tasks = lines.map(parseTaskLine);
             removeTasksFromGui();
-            for (task of tasks) {
+            for (var task of tasks) {
                 addTaskToGui(task);
             }
             return Promise.resolve(body);

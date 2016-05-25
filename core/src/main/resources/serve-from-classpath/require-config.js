@@ -6,7 +6,7 @@ var require = {
     shim: {
         'qunit': {
             exports: 'QUnit',
-            init: function () {
+            init: () => {
                 QUnit.config.autoload = false;
                 QUnit.config.autostart = false;
             }

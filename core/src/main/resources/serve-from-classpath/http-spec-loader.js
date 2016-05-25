@@ -1,8 +1,8 @@
-define(function () {
+define(() => {
     'use strict';
     var requestRegex = /(\w+) (\/[\w\-]+) HTTP\/1.1/;
     var responseRegex = /HTTP\/1.1 (\d+) \w+/;
-    var constructor = function (collaborators) {
+    var constructor = collaborators => {
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
         var fakeHttp = collaborators.fakeHttp;
@@ -51,10 +51,10 @@ define(function () {
             return http.sendAsync(specRequest).then(parseFunction);
 
         };
-        var loadResponse = function (name) {
+        var loadResponse = name => {
             return load({name: name, parseFunction: parseResponse})
         };
-        var loadRequest = function (name) {
+        var loadRequest = name => {
             return load({name: name, parseFunction: parseRequest});
         };
         var loadedRequestResponse = requestResponseArray => {

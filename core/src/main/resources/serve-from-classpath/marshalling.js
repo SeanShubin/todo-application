@@ -1,4 +1,5 @@
-define(function () {
+define(() => {
+    'use strict';
     var constructor = () => {
         var stringToInt = originalString => {
             var parsed = parseInt(originalString);

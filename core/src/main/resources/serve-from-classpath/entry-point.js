@@ -4,11 +4,12 @@ define([
         'marshalling',
         'node-util',
         'text!todo-list-style-showcase.html'],
-    function (createTasks,
-              createHttp,
-              createMarshalling,
-              createNodeUtil,
-              template) {
+    (createTasks,
+     createHttp,
+     createMarshalling,
+     createNodeUtil,
+     template) => {
+        'use strict';
         var http = createHttp();
         var tasks = createTasks({
             http: http,
@@ -16,7 +17,7 @@ define([
             nodeUtil: createNodeUtil(),
             template: template
         });
-        var appendRenderedTasks = function (dom) {
+        var appendRenderedTasks = dom => {
             document.body.appendChild(dom);
         };
         tasks.render().then(appendRenderedTasks);

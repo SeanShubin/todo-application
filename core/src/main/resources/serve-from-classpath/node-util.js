@@ -1,6 +1,7 @@
-define(function () {
-    var constructor = function () {
-        var classNameToSingleElement = function (options) {
+define(() => {
+    'use strict';
+    var constructor = () => {
+        var classNameToSingleElement = options => {
             var elements = options.node.getElementsByClassName(options.className);
             if (elements.length === 1) {
                 return elements[0];
@@ -8,7 +9,7 @@ define(function () {
                 throw 'expected exactly 1 element matching \'' + options.className + '\', got ' + elements.length
             }
         };
-        var selectExactlyOne = function (options) {
+        var selectExactlyOne = options => {
             var elements = options.node.querySelectorAll(options.query);
             if (elements.length === 1) {
                 return elements[0];
