@@ -1,9 +1,11 @@
 define(function () {
+    'use strict';
     var requestRegex = /(\w+) (\/[\w\-]+) HTTP\/1.1/;
     var responseRegex = /HTTP\/1.1 (\d+) \w+/;
     var constructor = function (collaborators) {
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
+        var fakeHttp = collaborators.fakeHttp;
         var extractBody = lines => {
             var isBlank = line => line === '';
             var blankLineIndex = lines.findIndex(isBlank);
@@ -34,9 +36,10 @@ define(function () {
             var statusString = parsedLineOne[1];
             var status = marshalling.stringToInt(statusString);
             var body = extractBody(lines);
-            return {
+            var response = {
                 body: body, status: status
             };
+            return response;
         };
         var load = options => {
             var name = options.name;
@@ -54,9 +57,34 @@ define(function () {
         var loadRequest = function (name) {
             return load({name: name, parseFunction: parseRequest});
         };
+        var loadedRequestResponse = requestResponseArray => {
+            var result = {
+                request: requestResponseArray[0],
+                response: requestResponseArray[1]
+            };
+            return result;
+        };
+        var prependDatabase = requestResponse => {
+            var request = {
+                method: requestResponse.request.method,
+                url: '/database' + requestResponse.request.uri,
+                body: requestResponse.request.body
+            };
+            var response = requestResponse.response;
+            return {
+                request: request,
+                response: response
+            }
+        };
+        var appendToFakeHttp = requestResponse => {
+            fakeHttp.addRequestResponsePair(requestResponse);
+        };
+        var loadRequestResponse = specPaths => {
+            return Promise.all([loadRequest(specPaths.request), loadResponse(specPaths.response)]).then(loadedRequestResponse).then(prependDatabase).then(appendToFakeHttp);
+        };
         var contract = {
-            loadRequest: loadRequest,
-            loadResponse: loadResponse
+            loadRequestResponse: loadRequestResponse,
+            fakeHttp: fakeHttp
         };
         return contract;
     };

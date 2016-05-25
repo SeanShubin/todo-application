@@ -1,10 +1,15 @@
 define(function () {
+    'use strict';
     var constructor = function () {
         var requestResponsePairs = [];
+        var normalizeString = target => {
+            if (target === undefined) return '';
+            else return target;
+        };
         var requestsEqual = function (left, right) {
             if (left.url !== right.url) return false;
             if (left.method !== right.method) return false;
-            if (left.body !== right.body) return false;
+            if (normalizeString(left.body) !== normalizeString(right.body)) return false;
             return true;
         };
         var requestToResponseIndex = function (request) {

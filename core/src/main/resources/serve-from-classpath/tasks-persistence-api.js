@@ -19,7 +19,7 @@ define([], () => {
         };
 
         var responseToTasks = response => {
-            var lines = marshalling.stringToLines(response.body);
+            var lines = marshalling.stringToLines(response.body.trim());
             var tasks = lines.map(parseTaskLine);
             return tasks;
         };
@@ -27,7 +27,7 @@ define([], () => {
         var list = () => {
             return http.sendAsync({
                 method: 'GET',
-                url: '/task'
+                url: '/database/task'
             }).then(responseToTasks)
         };
 
