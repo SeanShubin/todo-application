@@ -24,6 +24,10 @@ define([], () => {
             return tasks;
         };
 
+        var responseToTask = response => {
+            return responseToTasks(response)[0];
+        };
+
         var list = () => {
             return http.sendAsync({
                 method: 'GET',
@@ -32,12 +36,32 @@ define([], () => {
         };
 
         var add = name => {
+            return http.sendAsync({
+                method: 'POST',
+                url: '/database/task-event',
+                body: 'add ' + name
+            }).then(responseToTask);
         };
         var clear = () => {
+            return http.sendAsync({
+                method: 'POST',
+                url: '/database/task-event',
+                body: 'clear'
+            });
         };
         var done = id => {
+            return http.sendAsync({
+                method: 'POST',
+                url: '/database/task-event',
+                body: 'done ' + id
+            })
         };
         var undone = id => {
+            return http.sendAsync({
+                method: 'POST',
+                url: '/database/task-event',
+                body: 'undone ' + id
+            })
         };
         var contract = {
             list: list,

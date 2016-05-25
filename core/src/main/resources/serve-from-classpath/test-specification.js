@@ -4,7 +4,7 @@ define(['qunit', 'http', 'marshalling', 'http-spec-loader', 'fake-http', 'tasks-
 
         qunit.module('specification');
 
-        qunit.test("get tasks", assert => {
+        var createHelper = () => {
             var http = createHttp();
             var marshalling = createMarshalling();
             var fakeHttp = createFakeHttp();
@@ -17,6 +17,15 @@ define(['qunit', 'http', 'marshalling', 'http-spec-loader', 'fake-http', 'tasks-
                 marshalling: marshalling,
                 fakeHttp: fakeHttp
             });
+            return {
+                httpSpecLoader: httpSpecLoader,
+                tasksPersistenceApi: tasksPersistenceApi,
+                fakeHttp: fakeHttp
+            };
+        };
+
+        qunit.test("get tasks", assert => {
+            var helper = createHelper();
 
             assert.expect(11);
             var done = assert.async();
@@ -31,14 +40,90 @@ define(['qunit', 'http', 'marshalling', 'http-spec-loader', 'fake-http', 'tasks-
                 assert.equal(tasks[2].id, 3, 'tasks[2].id is 3');
                 assert.equal(tasks[2].done, false, 'tasks[2].done is false');
                 assert.equal(tasks[2].name, 'Task C', 'tasks[2].name is Task C');
-                assert.equal(fakeHttp.unconsumedRequestResponsePairs.length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
+                assert.equal(helper.fakeHttp.unconsumedRequestResponsePairs().length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
                 done();
             };
             var specPaths = {
                 request: 'todo/specification/task/get-task-request.txt',
                 response: 'todo/specification/task/get-task-response.txt'
             };
-            httpSpecLoader.loadRequestResponse(specPaths).then(tasksPersistenceApi.list).then(verify);
+            helper.httpSpecLoader.loadRequestResponse(specPaths).then(helper.tasksPersistenceApi.list).then(verify);
+        });
+
+        qunit.test("add task", assert => {
+            var helper = createHelper();
+
+            assert.expect(4);
+            var done = assert.async();
+            var verify = task => {
+                assert.equal(task.id, 1, 'task.id is 1');
+                assert.equal(task.done, false, 'task.done is false');
+                assert.equal(task.name, 'Task A', 'task.name is Task A');
+                assert.equal(helper.fakeHttp.unconsumedRequestResponsePairs().length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
+                done();
+            };
+            var specPaths = {
+                request: 'todo/specification/task-event/post-task-event-add-request.txt',
+                response: 'todo/specification/task-event/post-task-event-add-response.txt'
+            };
+            var addFunction = () => {
+                return helper.tasksPersistenceApi.add('Task A');
+            };
+            helper.httpSpecLoader.loadRequestResponse(specPaths).then(addFunction).then(verify);
+        });
+
+        qunit.test("task done", assert => {
+            var helper = createHelper();
+
+            assert.expect(1);
+            var done = assert.async();
+            var verify = () => {
+                assert.equal(helper.fakeHttp.unconsumedRequestResponsePairs().length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
+                done();
+            };
+            var specPaths = {
+                request: 'todo/specification/task-event/post-task-event-done-request.txt',
+                response: 'todo/specification/task-event/post-task-event-done-response.txt'
+            };
+            var taskDoneFunction = () => {
+                return helper.tasksPersistenceApi.done(1);
+            };
+            helper.httpSpecLoader.loadRequestResponse(specPaths).then(taskDoneFunction).then(verify);
+        });
+
+        qunit.test("task undone", assert => {
+            var helper = createHelper();
+
+            assert.expect(1);
+            var done = assert.async();
+            var verify = () => {
+                assert.equal(helper.fakeHttp.unconsumedRequestResponsePairs().length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
+                done();
+            };
+            var specPaths = {
+                request: 'todo/specification/task-event/post-task-event-undone-request.txt',
+                response: 'todo/specification/task-event/post-task-event-undone-response.txt'
+            };
+            var taskUndoneFunction = () => {
+                return helper.tasksPersistenceApi.undone(1);
+            };
+            helper.httpSpecLoader.loadRequestResponse(specPaths).then(taskUndoneFunction).then(verify);
+        });
+
+        qunit.test("clear tasks", assert => {
+            var helper = createHelper();
+
+            assert.expect(1);
+            var done = assert.async();
+            var verify = () => {
+                assert.equal(helper.fakeHttp.unconsumedRequestResponsePairs().length, 0, 'fakeHttp.unconsumedRequestResponsePairs.length is 0');
+                done();
+            };
+            var specPaths = {
+                request: 'todo/specification/task-event/post-task-event-clear-request.txt',
+                response: 'todo/specification/task-event/post-task-event-clear-response.txt'
+            };
+            helper.httpSpecLoader.loadRequestResponse(specPaths).then(helper.tasksPersistenceApi.clear).then(verify);
         });
     }
 );

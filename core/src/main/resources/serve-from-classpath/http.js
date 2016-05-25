@@ -5,7 +5,8 @@ define(function () {
                 var client = new XMLHttpRequest();
                 var executePromise = function () {
                     if (client.readyState === XMLHttpRequest.DONE) {
-                        resolve({status: client.status, body: client.responseText});
+                        var response = {status: client.status, body: client.responseText};
+                        resolve(response);
                     }
                 };
                 client.open(options.method, options.url);

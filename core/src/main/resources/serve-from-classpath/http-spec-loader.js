@@ -19,7 +19,7 @@ define(function () {
             }
         };
         var parseRequest = specRequest => {
-            var lines = marshalling.stringToLines(specRequest.body);
+            var lines = marshalling.stringToLines(specRequest.body.trim());
             var parsedLineOne = requestRegex.exec(lines[0]);
             var method = parsedLineOne[1];
             var uri = parsedLineOne[2];
@@ -31,7 +31,7 @@ define(function () {
             };
         };
         var parseResponse = specResponse => {
-            var lines = marshalling.stringToLines(specResponse.body);
+            var lines = marshalling.stringToLines(specResponse.body.trim());
             var parsedLineOne = responseRegex.exec(lines[0]);
             var statusString = parsedLineOne[1];
             var status = marshalling.stringToInt(statusString);
