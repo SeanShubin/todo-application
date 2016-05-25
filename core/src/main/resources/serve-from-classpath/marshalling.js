@@ -1,6 +1,6 @@
 define(function () {
-    var constructor = function () {
-        var stringToInt = function (originalString) {
+    var constructor = () => {
+        var stringToInt = originalString => {
             var parsed = parseInt(originalString);
             var backToString = parsed.toString();
             if (originalString === backToString) {
@@ -9,7 +9,7 @@ define(function () {
                 throw "Unable to convert '" + originalString + "' to an integer"
             }
         };
-        var stringToBoolean = function (originalString) {
+        var stringToBoolean = originalString => {
             if (originalString === 'true') {
                 return true;
             } else if (originalString === 'false') {
@@ -18,7 +18,7 @@ define(function () {
                 throw "Unable to convert '" + originalString + "' to a boolean"
             }
         };
-        var stringToLines = function (originalString) {
+        var stringToLines = originalString => {
             var splitLines = originalString.split(/\r\n|\r|\n/);
             if (splitLines.length === 1 && splitLines[0] === '') {
                 return [];
@@ -26,10 +26,14 @@ define(function () {
                 return splitLines;
             }
         };
+        var linesToString = lines => {
+            return lines.join('\r\n');
+        };
         var contract = {
             stringToInt: stringToInt,
             stringToBoolean: stringToBoolean,
-            stringToLines: stringToLines
+            stringToLines: stringToLines,
+            linesToString: linesToString
         };
         return contract;
     };
