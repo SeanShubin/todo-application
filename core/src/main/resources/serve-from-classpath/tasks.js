@@ -1,16 +1,13 @@
 define([], () => {
     'use strict';
     var constructor = collaborators => {
-        var http = collaborators.http;
-        var marshalling = collaborators.marshalling;
+        var tasksPersistenceApi = collaborators.tasksPersistenceApi;
         var nodeUtil = collaborators.nodeUtil;
         var template = collaborators.template;
 
         var body, addButton, clearButton, userInput, todoEntryTemplate, itemsListElement;
 
-        var renderTemplateFromHttpResponse = response => {
-            var lines = marshalling.stringToLines(response.body);
-            var tasks = lines.map(parseTaskLine);
+        var renderTemplateFromTasks = tasks => {
             removeTasksFromGui();
             for (var task of tasks) {
                 addTaskToGui(task);
@@ -24,29 +21,11 @@ define([], () => {
             }
         };
 
-        var parseTaskLine = line => {
-            var regex = /(\d+) (true|false) (.*)/;
-            var parts = regex.exec(line);
-            var id = marshalling.stringToInt(parts[1]);
-            var done = marshalling.stringToBoolean(parts[2]);
-            var name = parts[3];
-            var task = {
-                id: id,
-                done: done,
-                name: name
-            };
-            return task;
-        };
-
         var createTaskElement = options => {
             var node = options.template.cloneNode(true);
             var nameNode = nodeUtil.classNameToSingleElement({node: node, className: 'label-task-name'});
             nameNode.innerHTML = options.task.name;
             return node;
-        };
-
-        var getTasks = () => {
-            return http.sendAsync({method: "GET", url: 'database/task'});
         };
 
         var addButtonClick = () => {
@@ -67,15 +46,7 @@ define([], () => {
         };
 
         var addTask = newTaskName => {
-            var command = 'add ' + newTaskName;
-            var request = {method: 'POST', url: 'database/task-event', body: command};
-
-            var updateGui = response => {
-                var task = parseTaskLine(response.body);
-                addTaskToGui(task)
-            };
-
-            return http.sendAsync(request).then(updateGui);
+            return tasksPersistenceApi.add(newTaskName).then(addTaskToGui);
         };
 
         var addTaskToGui = task => {
@@ -84,23 +55,18 @@ define([], () => {
             var doneCheckbox = nodeUtil.classNameToSingleElement({node: taskElement, className: 'checkbox-task-done'});
             doneCheckbox.checked = task.done;
             var doneCheckboxPressed = () => {
-                var commandPrefix;
                 if (doneCheckbox.checked) {
-                    commandPrefix = 'done';
+                    tasksPersistenceApi.done(task.id);
                 } else {
-                    commandPrefix = 'undone';
+                    tasksPersistenceApi.undone(task.id);
                 }
-                var command = commandPrefix + ' ' + task.id;
-                var request = {method: 'POST', url: 'database/task-event', body: command};
-                http.sendAsync(request);
             };
-
             doneCheckbox.addEventListener('change', doneCheckboxPressed);
             itemsListElement.appendChild(taskElement);
         };
 
         var refreshTasks = () => {
-            return getTasks().then(renderTemplateFromHttpResponse);
+            return tasksPersistenceApi.list().then(renderTemplateFromTasks);
         };
 
         var setupEventHandling = () => {
@@ -114,9 +80,8 @@ define([], () => {
         };
 
         var clearButtonClick = () => {
-            var request = {method: 'POST', url: 'database/task-event', body: 'clear'};
             userInput.focus();
-            return http.sendAsync(request).then(refreshTasks);
+            return tasksPersistenceApi.clear().then(refreshTasks);
         };
 
         var render = () => {
