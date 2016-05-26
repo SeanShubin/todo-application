@@ -9,26 +9,58 @@
  Notice that the implementation gets its html from design showcase rather than templates
  This ensures that the appearance matches what the customer agreed to
 
- Although it is not complete yet, the sample http requests/responses will eventually come from a separate "specification" project
- This ensures that when the contract between the application and the persistence service changes, there are tests that catch the mismatch
+ Using a fake persistence api for the tasks allows us to decouple http concerns from gui concerns.
  */
 
-define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
-    (qunit, createTasks, createHttp, createMarshalling, createNodeUtil, template) => {
+define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
+    (qunit, createTasks, createMarshalling, createNodeUtil, template) => {
         'use strict';
         qunit.module('task');
 
-        var marshalling = createMarshalling();
-        var httpGetNoTasks = {
-            request: {
-                url: 'database/task',
-                method: 'GET'
-            },
-            response: {
-                status: 200,
-                body: ''
-            }
+        var createTasksPersistenceApi = () => {
+            var tasks = [];
+            var addResult;
+            var undoneInvocations = [];
+            var clearInvocationCount = 0;
+            var doneInvocations = [];
+            var addInvocations = [];
+            return {
+                list: () => {
+                    return Promise.resolve(tasks);
+                },
+                add: name => {
+                    addInvocations.push(name);
+                    return Promise.resolve(addResult);
+                },
+                undone: id => {
+                    undoneInvocations.push(id);
+                },
+                done: id => {
+                    doneInvocations.push(id);
+                },
+                clear: () => {
+                    clearInvocationCount++;
+                    return Promise.resolve();
+                },
+                addSampleTask: task => tasks.push(task),
+                setSampleAddResult: result => {
+                    addResult = result
+                },
+                clearInvocationCount: () => {
+                    return clearInvocationCount
+                },
+                doneInvocations: () => {
+                    return doneInvocations
+                },
+                undoneInvocations: () => {
+                    return undoneInvocations
+                },
+                addInvocations: () => {
+                    return addInvocations
+                }
+            };
         };
+        var marshalling = createMarshalling();
         var selectExactlyOne = (dom, selector) => {
             var nodes = dom.querySelectorAll(selector);
             if (nodes.length === 1) {
@@ -62,11 +94,11 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
         };
 
         var createHelper = () => {
-            var http = createHttp();
+            var tasksPersistenceApi = createTasksPersistenceApi();
+            var nodeUtil = createNodeUtil();
             var tasks = createTasks({
-                http: http,
-                marshalling: marshalling,
-                nodeUtil: createNodeUtil(),
+                tasksPersistenceApi: tasksPersistenceApi,
+                nodeUtil: nodeUtil,
                 template: template
             });
             var dom;
@@ -108,25 +140,22 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
             var contract = {
                 render: render,
                 userTypesTaskName: userTypesTaskName,
-                addRequestResponsePair: http.addRequestResponsePair,
                 userPressesAddTaskButton: userPressesAddTaskButton,
                 userPressesClearDoneButton: userPressesClearDoneButton,
                 userTogglesDoneCheckboxForId: userTogglesDoneCheckboxForId,
                 userPressesKey: userPressesKey,
                 tasksDisplayedToUser: tasksDisplayedToUser,
-                unconsumedRequestResponsePairs: http.unconsumedRequestResponsePairs
+                tasksPersistenceApi: tasksPersistenceApi
             };
             return contract;
         };
 
         qunit.test("render empty", assert => {
             var helper = createHelper();
-            helper.addRequestResponsePair(httpGetNoTasks);
-            assert.expect(8);
+            assert.expect(7);
             var done = assert.async();
             var verify = dom => {
                 assert.equal(dom.querySelectorAll('.list-item-task').length, 0, 'No tasks');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 assert.equal(selectExactlyOne(dom, 'h1').textContent, 'Todo List', 'title');
                 assert.equal(selectExactlyOne(dom, '.input-task-name').value, '', 'task name starts out empty');
                 assert.equal(selectExactlyOne(dom, '.button-add-task').innerText, 'Add Task', 'add task button exists');
@@ -140,18 +169,22 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("render tasks", assert => {
             var helper = createHelper();
-            var httpGetThreeSampleTasks = {
-                request: {
-                    url: 'database/task',
-                    method: 'GET'
-                },
-                response: {
-                    status: 200,
-                    body: '1 false Task A\n2 true Task B\n3 false Task C'
-                }
-            };
-            helper.addRequestResponsePair(httpGetThreeSampleTasks);
-            assert.expect(2);
+            helper.tasksPersistenceApi.addSampleTask({
+                "done": false,
+                "id": 1,
+                "name": "Task A"
+            });
+            helper.tasksPersistenceApi.addSampleTask({
+                "done": true,
+                "id": 2,
+                "name": "Task B"
+            });
+            helper.tasksPersistenceApi.addSampleTask({
+                "done": false,
+                "id": 3,
+                "name": "Task C"
+            });
+            assert.expect(1);
             var done = assert.async();
             var verify = dom => {
                 assert.deepEqual(helper.tasksDisplayedToUser(), [{
@@ -167,7 +200,6 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'Task C',
                     done: false
                 }], 'All three sample tasks found');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
                 done();
             };
             helper.render().then(verify);
@@ -175,20 +207,13 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("add item using button", assert => {
             var helper = createHelper();
-            helper.addRequestResponsePair(httpGetNoTasks);
+            helper.tasksPersistenceApi.setSampleAddResult({
+                id: 1,
+                name: 'Some Task',
+                done: false
+            });
             var addUser = () => {
                 helper.userTypesTaskName('Some Task');
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task-event',
-                        method: 'POST',
-                        body: 'add Some Task'
-                    },
-                    response: {
-                        status: 201,
-                        body: '1 false Some Task'
-                    }
-                });
                 return helper.userPressesAddTaskButton();
             };
             assert.expect(2);
@@ -199,7 +224,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'Some Task',
                     done: false
                 }], 'Added task');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.deepEqual(helper.tasksPersistenceApi.addInvocations(), ['Some Task'], 'add invoked');
                 done();
             };
             helper.render().then(addUser).then(verify);
@@ -207,21 +232,14 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("add item using enter key", assert => {
             var helper = createHelper();
-            helper.addRequestResponsePair(httpGetNoTasks);
+            helper.tasksPersistenceApi.setSampleAddResult({
+                id: 1,
+                name: 'Some Task',
+                done: false
+            });
             var enterKey = 13;
             var addUser = () => {
                 helper.userTypesTaskName('Some Task');
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task-event',
-                        method: 'POST',
-                        body: 'add Some Task'
-                    },
-                    response: {
-                        status: 201,
-                        body: '1 false Some Task'
-                    }
-                });
                 return helper.userPressesKey(enterKey);
             };
             assert.expect(2);
@@ -232,46 +250,20 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'Some Task',
                     done: false
                 }], 'Added task');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.deepEqual(helper.tasksPersistenceApi.addInvocations(), ['Some Task'], 'add invoked');
                 done();
             };
             helper.render().then(addUser).then(verify);
         });
 
-        qunit.test("clear done", assert => {
+        qunit.test("clear all tasks that are done", assert => {
             var helper = createHelper();
-            var taskDoneAndTaskNotDone = {
-                request: {
-                    url: 'database/task',
-                    method: 'GET'
-                },
-                response: {
-                    status: 200,
-                    body: '1 false This is not done\n2 true This is done'
-                }
-            };
-            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            helper.tasksPersistenceApi.addSampleTask({
+                "done": false,
+                "id": 1,
+                "name": "This is not done"
+            });
             var clearDone = () => {
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task-event',
-                        method: 'POST',
-                        body: 'clear'
-                    },
-                    response: {
-                        status: 200
-                    }
-                });
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task',
-                        method: 'GET'
-                    },
-                    response: {
-                        status: 200,
-                        body: '1 false This is not done'
-                    }
-                });
                 return helper.userPressesClearDoneButton();
             };
             assert.expect(2);
@@ -282,7 +274,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'This is not done',
                     done: false
                 }], 'Done task cleared');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.equal(helper.tasksPersistenceApi.clearInvocationCount(), 1, 'clear invoked')
                 done();
             };
             helper.render().then(clearDone).then(verify);
@@ -290,28 +282,12 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("set done", assert => {
             var helper = createHelper();
-            var taskDoneAndTaskNotDone = {
-                request: {
-                    url: 'database/task',
-                    method: 'GET'
-                },
-                response: {
-                    status: 200,
-                    body: '1 false This started out not done'
-                }
-            };
-            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            helper.tasksPersistenceApi.addSampleTask({
+                id: 1,
+                name: 'This started out not done',
+                done: false
+            });
             var setDone = () => {
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task-event',
-                        method: 'POST',
-                        body: 'done 1'
-                    },
-                    response: {
-                        status: 200
-                    }
-                });
                 return helper.userTogglesDoneCheckboxForId(1);
             };
             assert.expect(2);
@@ -322,7 +298,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'This started out not done',
                     done: true
                 }], 'Done toggled to true');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.deepEqual(helper.tasksPersistenceApi.doneInvocations(), [1], 'done invoked')
                 done();
             };
             helper.render().then(setDone).then(verify);
@@ -330,28 +306,12 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
 
         qunit.test("unset done", assert => {
             var helper = createHelper();
-            var taskDoneAndTaskNotDone = {
-                request: {
-                    url: 'database/task',
-                    method: 'GET'
-                },
-                response: {
-                    status: 200,
-                    body: '1 true This started out done'
-                }
-            };
-            helper.addRequestResponsePair(taskDoneAndTaskNotDone);
+            helper.tasksPersistenceApi.addSampleTask({
+                id: 1,
+                name: 'This started out done',
+                done: true
+            });
             var setDone = () => {
-                helper.addRequestResponsePair({
-                    request: {
-                        url: 'database/task-event',
-                        method: 'POST',
-                        body: 'undone 1'
-                    },
-                    response: {
-                        status: 200
-                    }
-                });
                 return helper.userTogglesDoneCheckboxForId(1);
             };
             assert.expect(2);
@@ -362,7 +322,7 @@ define(['qunit', 'tasks', 'fake-http', 'marshalling', 'node-util', 'text!todo-li
                     name: 'This started out done',
                     done: false
                 }], 'Done toggled to false');
-                assert.equal(helper.unconsumedRequestResponsePairs().length, 0, 'No unconsumed http requests');
+                assert.deepEqual(helper.tasksPersistenceApi.undoneInvocations(), [1], 'undone invoked')
                 done();
             };
             helper.render().then(setDone).then(verify);
