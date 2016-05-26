@@ -16,8 +16,9 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
     (qunit, createTasks, createMarshalling, createNodeUtil, template) => {
         'use strict';
         qunit.module('task');
+        var nodeUtil = createNodeUtil();
 
-        var createTasksPersistenceApi = () => {
+        var createFakeTasksPersistenceApi = () => {
             var tasks = [];
             var addResult;
             var undoneInvocations = [];
@@ -60,41 +61,10 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
                 }
             };
         };
-        var marshalling = createMarshalling();
-        var selectExactlyOne = (dom, selector) => {
-            var nodes = dom.querySelectorAll(selector);
-            if (nodes.length === 1) {
-                return nodes[0];
-            } else {
-                throw 'Expected exactly one match for ' + selector + ' got ' + nodes.length;
-            }
-        };
-
-        var howManyExist = (dom, selector) => {
-            var nodes = dom.querySelectorAll(selector);
-            return nodes.length;
-        };
-
-        var isChecked = (dom, selector) => {
-            return dom.querySelectorAll(selector + ':checked').length === 1
-        };
-
-        var toggleCheckbox = checkbox => {
-            checkbox.checked = !checkbox.checked;
-            var event = document.createEvent("HTMLEvents");
-            event.initEvent("change", false, true);
-            return checkbox.dispatchEvent(event);
-        };
-
-        var sendKeyUp = (target, key) => {
-            var event = document.createEvent("HTMLEvents");
-            event.initEvent("keyup", false, true);
-            event.which = key;
-            return target.dispatchEvent(event);
-        };
 
         var createHelper = () => {
-            var tasksPersistenceApi = createTasksPersistenceApi();
+            var tasksPersistenceApi = createFakeTasksPersistenceApi();
+            var marshalling = createMarshalling();
             var nodeUtil = createNodeUtil();
             var tasks = createTasks({
                 tasksPersistenceApi: tasksPersistenceApi,
@@ -112,19 +82,22 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
                 return tasks.clearButtonClick();
             };
             var userTogglesDoneCheckboxForId = id => {
-                var element = selectExactlyOne(dom, '[data-id="' + id + '"] .checkbox-task-done');
-                return toggleCheckbox(element);
+                var element = nodeUtil.selectExactlyOne({
+                    dom: dom,
+                    selector: '[data-id="' + id + '"] .checkbox-task-done'
+                });
+                return nodeUtil.toggleCheckbox(element);
             };
             var userTypesTaskName = taskName => {
-                selectExactlyOne(dom, '.input-task-name').value = taskName;
+                nodeUtil.selectExactlyOne({dom: dom, selector: '.input-task-name'}).value = taskName;
             };
             var userPressesKey = whichKey => {
-                var element = selectExactlyOne(dom, '.input-task-name');
-                return sendKeyUp(element, whichKey);
+                var element = nodeUtil.selectExactlyOne({dom: dom, selector: '.input-task-name'});
+                return nodeUtil.sendKeyUp({element: element, key: whichKey});
             };
             var taskElementToTask = taskElement => {
-                var name = selectExactlyOne(taskElement, '.label-task-name').textContent;
-                var done = isChecked(taskElement, '.checkbox-task-done');
+                var name = nodeUtil.selectExactlyOne({dom: taskElement, selector: '.label-task-name'}).textContent;
+                var done = nodeUtil.isChecked({dom: taskElement, selector: '.checkbox-task-done'});
                 var id = marshalling.stringToInt(taskElement.dataset.id);
                 return {
                     id: id,
@@ -156,11 +129,20 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
             var done = assert.async();
             var verify = dom => {
                 assert.equal(dom.querySelectorAll('.list-item-task').length, 0, 'No tasks');
-                assert.equal(selectExactlyOne(dom, 'h1').textContent, 'Todo List', 'title');
-                assert.equal(selectExactlyOne(dom, '.input-task-name').value, '', 'task name starts out empty');
-                assert.equal(selectExactlyOne(dom, '.button-add-task').innerText, 'Add Task', 'add task button exists');
-                assert.equal(howManyExist(dom, '.list-tasks'), 1, 'task list exists');
-                assert.equal(selectExactlyOne(dom, '.button-clear-done').innerText, 'Clear Done', 'clear done button exists');
+                assert.equal(nodeUtil.selectExactlyOne({dom: dom, selector: 'h1'}).textContent, 'Todo List', 'title');
+                assert.equal(nodeUtil.selectExactlyOne({
+                    dom: dom,
+                    selector: '.input-task-name'
+                }).value, '', 'task name starts out empty');
+                assert.equal(nodeUtil.selectExactlyOne({
+                    dom: dom,
+                    selector: '.button-add-task'
+                }).innerText, 'Add Task', 'add task button exists');
+                assert.equal(nodeUtil.howManyExist({dom: dom, selector: '.list-tasks'}), 1, 'task list exists');
+                assert.equal(nodeUtil.selectExactlyOne({
+                    dom: dom,
+                    selector: '.button-clear-done'
+                }).innerText, 'Clear Done', 'clear done button exists');
                 assert.deepEqual(helper.tasksDisplayedToUser(), [], 'Added task');
                 done();
             };

@@ -1,6 +1,7 @@
 define(() => {
     'use strict';
     var constructor = () => {
+        //private
         var stringToInt = originalString => {
             var parsed = parseInt(originalString);
             var backToString = parsed.toString();
@@ -30,6 +31,7 @@ define(() => {
         var linesToString = lines => {
             return lines.join('\r\n');
         };
+        //public
         var contract = {
             stringToInt: stringToInt,
             stringToBoolean: stringToBoolean,

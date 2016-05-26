@@ -1,9 +1,10 @@
 define([], () => {
     'use strict';
     var constructor = collaborators => {
+        //collaborators
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
-
+        //private
         var parseTaskLine = line => {
             var regex = /(\d+) (true|false) (.*)/;
             var parts = regex.exec(line);
@@ -17,24 +18,20 @@ define([], () => {
             };
             return task;
         };
-
         var responseToTasks = response => {
             var lines = marshalling.stringToLines(response.body.trim());
             var tasks = lines.map(parseTaskLine);
             return tasks;
         };
-
         var responseToTask = response => {
             return responseToTasks(response)[0];
         };
-
         var list = () => {
             return http.sendAsync({
                 method: 'GET',
                 url: '/database/task'
             }).then(responseToTasks)
         };
-
         var add = name => {
             return http.sendAsync({
                 method: 'POST',
@@ -63,6 +60,7 @@ define([], () => {
                 body: 'undone ' + id
             })
         };
+        //public
         var contract = {
             list: list,
             add: add,

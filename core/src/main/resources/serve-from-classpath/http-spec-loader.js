@@ -3,9 +3,11 @@ define(() => {
     var requestRegex = /(\w+) (\/[\w\-]+) HTTP\/1.1/;
     var responseRegex = /HTTP\/1.1 (\d+) \w+/;
     var constructor = collaborators => {
+        //collaborators
         var http = collaborators.http;
         var marshalling = collaborators.marshalling;
         var fakeHttp = collaborators.fakeHttp;
+        //private
         var extractBody = lines => {
             var isBlank = line => line === '';
             var blankLineIndex = lines.findIndex(isBlank);
@@ -82,6 +84,7 @@ define(() => {
         var loadRequestResponse = specPaths => {
             return Promise.all([loadRequest(specPaths.request), loadResponse(specPaths.response)]).then(loadedRequestResponse).then(prependDatabase).then(appendToFakeHttp);
         };
+        //public
         var contract = {
             loadRequestResponse: loadRequestResponse,
             fakeHttp: fakeHttp

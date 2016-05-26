@@ -1,6 +1,7 @@
 define(() => {
     'use strict';
     var constructor = () => {
+        //private
         var sendAsync = options => {
             return new Promise(resolve => {
                 var client = new XMLHttpRequest();
@@ -16,6 +17,7 @@ define(() => {
                 client.send(options.body);
             });
         };
+        //public
         var contract = {
             sendAsync: sendAsync
         };

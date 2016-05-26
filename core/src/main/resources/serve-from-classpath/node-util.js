@@ -1,25 +1,60 @@
 define(() => {
     'use strict';
     var constructor = () => {
+        //private
         var classNameToSingleElement = options => {
-            var elements = options.node.getElementsByClassName(options.className);
+            var node = options.node;
+            var className = options.className;
+            var elements = node.getElementsByClassName(className);
             if (elements.length === 1) {
                 return elements[0];
             } else {
-                throw 'expected exactly 1 element matching \'' + options.className + '\', got ' + elements.length
+                throw 'expected exactly 1 element matching \'' + className + '\', got ' + elements.length
             }
         };
         var selectExactlyOne = options => {
-            var elements = options.node.querySelectorAll(options.query);
-            if (elements.length === 1) {
-                return elements[0];
+            var dom = options.dom;
+            var selector = options.selector;
+            var nodes = dom.querySelectorAll(selector);
+            if (nodes.length === 1) {
+                return nodes[0];
             } else {
-                throw 'expected exactly 1 element matching \'' + options.query + '\', got ' + elements.length
+                throw 'Expected exactly one match for ' + selector + ' got ' + nodes.length;
             }
         };
+        var howManyExist = options => {
+            var dom = options.dom;
+            var selector = options.selector;
+            var nodes = dom.querySelectorAll(selector);
+            return nodes.length;
+        };
+        var isChecked = options => {
+            var dom = options.dom;
+            var selector = options.selector;
+            return dom.querySelectorAll(selector + ':checked').length === 1
+        };
+        var toggleCheckbox = checkbox => {
+            checkbox.checked = !checkbox.checked;
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("change", false, true);
+            return checkbox.dispatchEvent(event);
+        };
+        var sendKeyUp = options => {
+            var element = options.element;
+            var key = options.key;
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("keyup", false, true);
+            event.which = key;
+            return element.dispatchEvent(event);
+        };
+        //public
         var contract = {
             classNameToSingleElement: classNameToSingleElement,
-            selectExactlyOne: selectExactlyOne
+            selectExactlyOne: selectExactlyOne,
+            toggleCheckbox: toggleCheckbox,
+            howManyExist: howManyExist,
+            isChecked: isChecked,
+            sendKeyUp: sendKeyUp
         };
         return contract;
     };
