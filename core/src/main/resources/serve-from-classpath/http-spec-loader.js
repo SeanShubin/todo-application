@@ -1,5 +1,6 @@
 define(() => {
     'use strict';
+    //constants
     var requestRegex = /(\w+) (\/[\w\-]+) HTTP\/1.1/;
     var responseRegex = /HTTP\/1.1 (\d+) \w+/;
     var constructor = collaborators => {
@@ -24,11 +25,11 @@ define(() => {
             var lines = marshalling.stringToLines(specRequest.body.trim());
             var parsedLineOne = requestRegex.exec(lines[0]);
             var method = parsedLineOne[1];
-            var uri = parsedLineOne[2];
+            var url = parsedLineOne[2];
             var body = extractBody(lines);
             return {
                 method: method,
-                uri: uri,
+                url: url,
                 body: body
             };
         };
@@ -69,7 +70,7 @@ define(() => {
         var prependDatabase = requestResponse => {
             var request = {
                 method: requestResponse.request.method,
-                url: '/database' + requestResponse.request.uri,
+                url: '/database' + requestResponse.request.url,
                 body: requestResponse.request.body
             };
             var response = requestResponse.response;

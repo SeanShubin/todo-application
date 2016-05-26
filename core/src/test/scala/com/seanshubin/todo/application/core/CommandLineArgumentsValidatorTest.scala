@@ -6,6 +6,7 @@ import org.scalatest.FunSuite
 test-driven-003
 Once we got the JettyRunnerTest working, we tried to wire it into the entry point
 This made us notice that JettyRunner depends on a port, so now we have to add code that configures the port
+Although you can see more settings now, this started with only validating the port
  */
 class CommandLineArgumentsValidatorTest extends FunSuite {
   test("valid configuration") {

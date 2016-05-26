@@ -9,7 +9,7 @@
  Notice that the implementation gets its html from design showcase rather than templates
  This ensures that the appearance matches what the customer agreed to
 
- Using a fake persistence api for the tasks allows us to decouple http concerns from gui concerns.
+ Using a stub persistence api for the tasks allows us to decouple http concerns from gui concerns.
  */
 
 define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-showcase.html'],
@@ -18,7 +18,7 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
         qunit.module('task');
         var nodeUtil = createNodeUtil();
 
-        var createFakeTasksPersistenceApi = () => {
+        var createStubTasksPersistenceApi = () => {
             var tasks = [];
             var addResult;
             var undoneInvocations = [];
@@ -63,7 +63,7 @@ define(['qunit', 'tasks', 'marshalling', 'node-util', 'text!todo-list-style-show
         };
 
         var createHelper = () => {
-            var tasksPersistenceApi = createFakeTasksPersistenceApi();
+            var tasksPersistenceApi = createStubTasksPersistenceApi();
             var marshalling = createMarshalling();
             var nodeUtil = createNodeUtil();
             var tasks = createTasks({

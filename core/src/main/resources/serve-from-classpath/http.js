@@ -3,6 +3,9 @@ define(() => {
     var constructor = () => {
         //private
         var sendAsync = options => {
+            var method = options.method;
+            var url = options.url;
+            var body = options.body;
             return new Promise(resolve => {
                 var client = new XMLHttpRequest();
                 var executePromise = () => {
@@ -11,10 +14,10 @@ define(() => {
                         resolve(response);
                     }
                 };
-                client.open(options.method, options.url);
+                client.open(method, url);
                 client.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
                 client.onreadystatechange = executePromise;
-                client.send(options.body);
+                client.send(body);
             });
         };
         //public

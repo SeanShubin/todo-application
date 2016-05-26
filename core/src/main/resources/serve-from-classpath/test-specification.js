@@ -1,3 +1,10 @@
+/*
+ test-driven-009
+ Now that we know what we need from the persistence api, it is time to design the specification
+ Notice that the specification knows nothing about programming languages, it only knows that we are using HTTP 1.1
+ Also notice that there is no binary dependency on the persistence layer, only a dependency on the specification
+ This separation of concerns allows us to keep each part simpler than it would be if we were trying to ensure no duplication between the projects
+ */
 define(['qunit', 'http', 'marshalling', 'http-spec-loader', 'fake-http', 'tasks-persistence-api'],
     (qunit, createHttp, createMarshalling, createHttpSpecLoader, createFakeHttp, createTasksPersistenceApi) => {
         'use strict';
