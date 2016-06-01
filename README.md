@@ -52,24 +52,19 @@ Application layer for Scala training sample project
     - this does not mean you can't have mutable persistence, but only the immutable persistence is canonical
     - mutable persistence must be entirely derivable from the immutable persistence
 - No mocks
+    - First, some definitions from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
+        - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
+        - Fake objects actually have working implementations, but usually take some shortcut which makes them not suitable for production (an in memory database is a good example).
+        - Stubs provide canned answers to calls made during the test, usually not responding at all to anything outside what's programmed in for the test. Stubs may also record information about calls, such as an email gateway stub that remembers the messages it 'sent', or maybe only how many messages it 'sent'.
+        - Mocks are what we are talking about here: objects pre-programmed with expectations which form a specification of the calls they are expected to receive.
     - while I don't have a problem with mocks in principle, you should only reach for them when dummys, stubs, or fakes will not work
     - mocks encourage exercising rather than testing your code
     - sometimes exercising your code is what you want, such as for controllers that do nothing but delegate to other classes
     - but you can still test that with stubs or fakes, and with stubs you can refactor duplication
     - refactor enough duplication, and your stub starts to look more and more like a fake
     - and can re-use the behavior across many tests
-    - definitions I am using
-        - dummy: a properly typed null that is never invoked, it is only used to get the application to compile
-        - stub: a limited, deterministic implementation that only emulates and records just enough behavior for a small number of tests
-        - fake: a deterministic implementation that simulates a large portion of behavior and is reusable across a large number of tests
 - Given, when, then
     - no given a, when b, then c, when d, then e
     - if I need that, I will break it up into two tests
         - given a, when b, then c
         - given a b, when d, then e
-## Definitions
-- from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
-    - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
-    - Fake objects actually have working implementations, but usually take some shortcut which makes them not suitable for production (an in memory database is a good example).
-    - Stubs provide canned answers to calls made during the test, usually not responding at all to anything outside what's programmed in for the test. Stubs may also record information about calls, such as an email gateway stub that remembers the messages it 'sent', or maybe only how many messages it 'sent'.
-    - Mocks are what we are talking about here: objects pre-programmed with expectations which form a specification of the calls they are expected to receive.
