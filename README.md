@@ -30,6 +30,12 @@ Application layer for Scala training sample project
     - Tests are not a substitute for actually checking if the thing works initially
     - [types of tests](http://seanshubin.com/types-of-tests.svg)
 - Design by Contract
+    - Organize code in logical units such that
+        - a contract is implied by naming, signature, interface, specification, or documentation.
+        - the caller is responsible for the preconditions of the contract
+        - the implementor is responsible for the postconditions and invariants of the contract
+        - an exception is thrown if and only if the contract cannot be fulfilled
+        - this is the opposite of defensive programming
 - Service Oriented Architecture
     - The only shared design is at the network specification (in this case, http)
     - Other than that, application and persistence know nothing about each other
