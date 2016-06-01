@@ -46,6 +46,8 @@ Application layer for Scala training sample project
     - at the persistence level
         - no updates
         - no deletes
+    - this does not mean you can't have mutable persistence, but only the immutable persistence is canonical
+    - mutable persistence must be entirely derivable from the immutable persistence
 - No mocks
     - while I don't have a problem with mocks in principle, you should only reach for them when dummys, stubs, or fakes will not work
     - mocks encourage exercising rather than testing your code
@@ -61,7 +63,7 @@ Application layer for Scala training sample project
     - no given a, when b, then c, when d, then e
     - if I need that, I will break it up into two tests
         - given a, when b, then c
-        - given a b c, when d, then e
+        - given a b, when d, then e
 ## Definitions
 - from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
     - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
