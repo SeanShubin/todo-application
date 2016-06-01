@@ -25,6 +25,9 @@ Application layer for Scala training sample project
     - Planned design leads to a bunch of stuff you don't need
     - Agile design allows the design to evolve as needed
 - Test Driven Design
+    - Tests are good at influencing the design towards design by contract
+    - Tests are good at catching regressions after something has been confirmed to work
+    - Tests are not a substitute for actually checking if the thing works initially
     - [types of tests](http://seanshubin.com/types-of-tests.svg)
 - Design by Contract
 - Service Oriented Architecture
