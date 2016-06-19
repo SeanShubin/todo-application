@@ -1,16 +1,14 @@
-Application layer for Scala training sample project
-===================================================
+# Application layer for Scala training sample project
 
-## Differing opinions
-- You may not agree with all of my design principles, and that is fine
-- I am teaching one possible way to write maintainable code
-- The important thing is that you understand why I have applied these design principles, so you can make an informed decision as to when to deviate from these principles
+## The design choices favor maintainability
+- If you disagree with some of my design decisions for this example, it is probably due to my placing such a high priority on maintainability.
+- The important thing is that you understand why I have applied these design principles in this case, so you can decide for yourself if the same design principles apply to your case
 - Keep in mind that I am demonstrating how to write code that is easy to maintain, not easy to write
 - Code is initially written once, by few, but maintained perpetually, by many
 - So it is not unreasonable to trade some extra effort up front for ease of maintenance later
 - Before objecting to any practice that seems like extra work up front, think about maintainability
 - It takes a great deal of discipline and effort to write maintainable code, but it is not complicated once you know what to do
-- With this in mind, I will counter any objection in the form of "but that takes so much effort write!", with something of the form "effort that makes code easier to maintain is worth it"
+- Feel free to point out any improvements that make the code easier to maintain
 
 ## Design Principles
 - Structured Design
@@ -57,6 +55,9 @@ Application layer for Scala training sample project
         - no deletes
     - this does not mean you can't have mutable persistence, but only the immutable persistence is canonical
     - mutable persistence must be entirely derivable from the immutable persistence
+    - the essence of lambda architecture lies in how you organize your data
+        - canonical data should be simple and permanent (remember: canonical, simple, permanent)
+        - only allow data to be complex if it can be treated as transient, re-derived if necessary (remember: derived, complex, transient)
 - No mocks
     - First, some definitions from [Martin Fowler's Article](http://martinfowler.com/articles/mocksArentStubs.html)
         - Dummy objects are passed around but never actually used. Usually they are just used to fill parameter lists.
