@@ -27,7 +27,7 @@
 http://localhost:7001
 
 
-## Design principles
+## Priorities
 - Meet Customer Need
 - Easy To Maintain (same as: Easy To Test)
 - Clearly Express Intent
