@@ -1,12 +1,17 @@
 # Application layer for Scala training sample project
 
-## The design choices favor maintainability
-- If you disagree with some of my design decisions for this example, it is probably due to my placing such a high priority on maintainability.
+## Design principles
+- Meet Customer Need
+- Easy To Maintain (same as: Easy To Test)
+- Clearly Express Intent
+- No Duplicate Code
+- Concise As Possible
+
+## Other designs are possible
+- You may not agree with every design choice I made
 - The important thing is that you understand why I have applied these design principles in this case, so you can decide for yourself if the same design principles apply to your case
 - Keep in mind that I am demonstrating how to write code that is easy to maintain, not easy to write
 - Code is initially written once, by few, but maintained perpetually, by many
-- So it is not unreasonable to trade some extra effort up front for ease of maintenance later
-- Before objecting to any practice that seems like extra work up front, think about maintainability
 - It takes a great deal of discipline and effort to write maintainable code, but it is not complicated once you know what to do
 - Feel free to point out any improvements that make the code easier to maintain
 
