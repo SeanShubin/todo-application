@@ -1,5 +1,32 @@
 # Application layer for Scala training sample project
 
+## Check out the sample projects
+
+    mkdir training
+    cd training
+    git clone git@github.com:SeanShubin/todo-application
+    git clone git@github.com:SeanShubin/todo-persistence
+    git clone git@github.com:SeanShubin/todo-specification
+
+### Install specification to your local maven repository
+    cd todo-specification
+    mvn install
+
+### Package and run persistence
+    cd todo-persistence
+    mvn package
+    ./run.sh
+
+### Package and run application
+    cd todo-persistence
+    mvn package
+    ./run.sh
+
+### Navigate to application
+
+http://localhost:7001
+
+
 ## Design principles
 - Meet Customer Need
 - Easy To Maintain (same as: Easy To Test)
