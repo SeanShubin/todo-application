@@ -18,7 +18,7 @@
     ./run.sh
 
 ### Package and run application
-    cd todo-persistence
+    cd todo-application
     mvn package
     ./run.sh
 
