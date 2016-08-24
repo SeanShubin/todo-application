@@ -1,7 +1,7 @@
 package com.seanshubin.todo.application.console
 
 import com.seanshubin.todo.application.contract.{FilesContract, FilesDelegate}
-import com.seanshubin.todo.application.core._
+import com.seanshubin.todo.application.domain._
 
 trait EntryPointWiring {
   def commandLineArguments: Seq[String]

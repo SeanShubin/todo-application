@@ -10,7 +10,7 @@
     <dependencies>
         <dependency>
             <groupId>com.seanshubin.todo</groupId>
-            <artifactId>todo-application-core</artifactId>
+            <artifactId>todo-application-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

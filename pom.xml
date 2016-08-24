@@ -56,7 +56,7 @@
         </dependencies>
     </dependencyManagement>
     <modules>
-        <module>core</module>
+        <module>domain</module>
         <module>console</module>
         <module>contract</module>
         <module>contract-test</module>

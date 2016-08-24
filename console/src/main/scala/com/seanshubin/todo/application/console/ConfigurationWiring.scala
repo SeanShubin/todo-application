@@ -4,7 +4,7 @@ import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.Path
 
 import com.seanshubin.todo.application.contract.{ClassLoaderContract, ClassLoaderDelegate, FilesContract, FilesDelegate}
-import com.seanshubin.todo.application.core._
+import com.seanshubin.todo.application.domain._
 import org.eclipse.jetty.server.Handler
 
 trait ConfigurationWiring {
