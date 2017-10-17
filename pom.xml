@@ -40,18 +40,18 @@
             <dependency>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest_2.12</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>9.4.6.v20170531</version>
+                <version>9.4.7.v20170914</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client</artifactId>
-                <version>1.22.0</version>
+                <version>1.23.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
